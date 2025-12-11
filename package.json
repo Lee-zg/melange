@@ -71,12 +71,12 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/username/melange.git"
+    "url": "https://github.com/Lee-zg/melange.git"
   },
   "bugs": {
-    "url": "https://github.com/username/melange/issues"
+    "url": "https://github.com/Lee-zg/melange/issues"
   },
-  "homepage": "https://github.com/username/melange#readme",
+  "homepage": "https://github.com/Lee-zg/melange#readme",
   "devDependencies": {
     "@types/node": "^20.10.0",
     "@typescript-eslint/eslint-plugin": "^6.13.0",
