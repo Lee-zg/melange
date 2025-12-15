@@ -31,8 +31,8 @@ yarn-error.log*
 # TypeScript
 *.tsbuildinfo
 
-# Documentation
-docs/
+# Documentation build output (source files are tracked)
+# docs/  # Removed - VitePress source files should be tracked
 
 # Temporary files
 /tmp/
@@ -40,3 +40,7 @@ temp/
 
 # History files
 .history/
+
+# VitePress
+docs/.vitepress/dist/
+docs/.vitepress/cache/

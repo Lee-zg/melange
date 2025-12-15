@@ -11,6 +11,7 @@ export default defineConfig({
     'fp/index': 'src/fp/index.ts',
     'utils/index': 'src/utils/index.ts',
     'core/index': 'src/core/index.ts',
+    'plugins/index': 'src/plugins/index.ts',
   },
 
   // 输出格式：ESM 和 CommonJS

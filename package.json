@@ -1,7 +1,7 @@
 {
   "name": "melange",
   "version": "1.0.0",
-  "description": "一个现代化的 JavaScript/TypeScript 工具库，支持函数式编程、面向对象模式和全面的类型支持"
+  "description": "一个现代化的 JavaScript/TypeScript 工具库，支持函数式编程、面向对象模式和全面的类型支持",
   "type": "module",
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
@@ -36,6 +36,26 @@
         "types": "./dist/utils/index.d.cts",
         "default": "./dist/utils/index.cjs"
       }
+    },
+    "./core": {
+      "import": {
+        "types": "./dist/core/index.d.ts",
+        "default": "./dist/core/index.js"
+      },
+      "require": {
+        "types": "./dist/core/index.d.cts",
+        "default": "./dist/core/index.cjs"
+      }
+    },
+    "./plugins": {
+      "import": {
+        "types": "./dist/plugins/index.d.ts",
+        "default": "./dist/plugins/index.js"
+      },
+      "require": {
+        "types": "./dist/plugins/index.d.cts",
+        "default": "./dist/plugins/index.cjs"
+      }
     }
   },
   "files": [
@@ -55,7 +75,10 @@
     "typecheck": "tsc --noEmit",
     "prepublishOnly": "npm run build",
     "clean": "rimraf dist",
-    "docs": "typedoc --out docs src/index.ts"
+    "docs": "vitepress dev docs",
+    "docs:build": "vitepress build docs",
+    "docs:preview": "vitepress preview docs",
+    "docs:deploy": "npm run docs:build && echo 'Documentation built. Push to main branch to deploy.'"
   },
   "keywords": [
     "utility",
@@ -65,7 +88,13 @@
     "library",
     "helpers",
     "decorators",
-    "fp"
+    "fp",
+    "speech",
+    "tts",
+    "stt",
+    "speech-synthesis",
+    "speech-recognition",
+    "web-speech-api"
   ],
   "author": "",
   "license": "MIT",
@@ -90,6 +119,7 @@
     "tsup": "^8.0.1",
     "typedoc": "^0.25.4",
     "typescript": "^5.3.2",
+    "vitepress": "^1.6.4",
     "vitest": "^1.0.0"
   },
   "engines": {

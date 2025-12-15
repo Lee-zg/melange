@@ -1,0 +1,35 @@
+<svg width="128" height="128" viewBox="0 0 128 128" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="gradient1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#bd34fe;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#41d1ff;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="gradient2" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#41d1ff;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#bd34fe;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- 外圆 -->
+  <circle cx="64" cy="64" r="60" stroke="url(#gradient1)" stroke-width="4" fill="none"/>
+  
+  <!-- M 字母 -->
+  <path d="M 32 88 L 32 40 L 48 60 L 64 40 L 64 88" 
+        stroke="url(#gradient1)" 
+        stroke-width="6" 
+        stroke-linecap="round" 
+        stroke-linejoin="round"
+        fill="none"/>
+  
+  <!-- 装饰点 -->
+  <circle cx="80" cy="48" r="6" fill="url(#gradient2)"/>
+  <circle cx="92" cy="64" r="5" fill="url(#gradient1)"/>
+  <circle cx="80" cy="80" r="4" fill="url(#gradient2)"/>
+  
+  <!-- 函数符号 λ 简化版 -->
+  <path d="M 76 56 Q 84 64 76 72" 
+        stroke="url(#gradient1)" 
+        stroke-width="3" 
+        stroke-linecap="round"
+        fill="none"/>
+</svg>

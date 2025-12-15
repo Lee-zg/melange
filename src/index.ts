@@ -259,6 +259,51 @@ export {
 } from './core';
 
 // ============================================================================
+// 插件模块
+// ============================================================================
+
+export {
+  // 语音合成
+  SpeechSynthesizerImpl,
+  createSpeechSynthesizer,
+  isSpeechSynthesisSupported,
+  speak,
+  // 语音识别
+  SpeechRecognizerImpl,
+  createSpeechRecognizer,
+  isSpeechRecognitionSupported,
+  listen,
+} from './plugins';
+
+// 语音模块类型导出
+export type {
+  SpeechProviderType,
+  SpeechServiceStatus,
+  SpeechError,
+  BaseSpeechConfig,
+  VoiceInfo,
+  SynthesisConfig,
+  SynthesisEventType,
+  SynthesisEvent,
+  SynthesisEventHandler,
+  SynthesisProvider,
+  SpeechSynthesizer,
+  RecognitionResultItem,
+  RecognitionResult,
+  RecognitionConfig,
+  RecognitionEventType,
+  RecognitionEvent,
+  RecognitionEventHandler,
+  RecognitionProvider,
+  SpeechRecognizer,
+  AzureSpeechConfig,
+  GoogleSpeechConfig,
+  AWSSpeechConfig,
+  CustomProviderConfig,
+  ProviderConfig,
+} from './plugins';
+
+// ============================================================================
 // 库版本
 // ============================================================================
 
