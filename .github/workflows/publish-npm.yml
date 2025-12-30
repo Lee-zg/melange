@@ -1,4 +1,4 @@
-name: Publish to npm
+name: Publish Package
 
 on:
   # 当创建新的版本标签时触发
@@ -10,6 +10,7 @@ on:
 
 permissions:
   contents: read
+  packages: write
 
 jobs:
   # 测试作业
@@ -37,8 +38,8 @@ jobs:
       - name: Type check
         run: npm run typecheck
 
-  # 发布作业
-  publish:
+  # 发布到 npmjs.com
+  publish-npm:
     needs: test
     runs-on: ubuntu-latest
     permissions:
@@ -65,3 +66,33 @@ jobs:
         run: npm publish --provenance --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+  # 发布到 GitHub Packages
+  publish-gpr:
+    needs: test
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          registry-url: 'https://npm.pkg.github.com'
+          scope: '@lee-zg'
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build
+        run: npm run build
+
+      - name: Publish to GitHub Packages
+        run: npm publish --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
