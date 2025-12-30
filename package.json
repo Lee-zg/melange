@@ -1,7 +1,10 @@
 {
-  "name": "melange",
+  "name": "@lee-zg/melange",
   "version": "1.0.0",
-  "description": "一个现代化的 JavaScript/TypeScript 工具库，支持函数式编程、面向对象模式和全面的类型支持",
+  "publishConfig": {
+    "access": "public"
+  },
+  "description": "一个现代化的 JavaScript/TypeScript 个人工具库，支持函数式编程、面向对象模式和全面的类型支持",
   "type": "module",
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
@@ -96,7 +99,7 @@
     "speech-recognition",
     "web-speech-api"
   ],
-  "author": "",
+  "author": "lee-zg",
   "license": "MIT",
   "repository": {
     "type": "git",
@@ -105,7 +108,7 @@
   "bugs": {
     "url": "https://github.com/Lee-zg/melange/issues"
   },
-  "homepage": "https://github.com/Lee-zg/melange#readme",
+  "homepage": "https://lee-zg.github.io/melange/",
   "devDependencies": {
     "@types/node": "^20.10.0",
     "@typescript-eslint/eslint-plugin": "^6.13.0",

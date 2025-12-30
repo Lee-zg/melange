@@ -44,3 +44,6 @@ temp/
 # VitePress
 docs/.vitepress/dist/
 docs/.vitepress/cache/
+
+# wiki files
+.qoder
