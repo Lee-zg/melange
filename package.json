@@ -81,7 +81,10 @@
     "docs": "vitepress dev docs",
     "docs:build": "vitepress build docs",
     "docs:preview": "vitepress preview docs",
-    "docs:deploy": "npm run docs:build && echo 'Documentation built. Push to main branch to deploy.'"
+    "docs:deploy": "npm run docs:build && echo 'Documentation built. Push to main branch to deploy.'",
+    "release:patch": "npm version patch && git push origin main --tags",
+    "release:minor": "npm version minor && git push origin main --tags",
+    "release:major": "npm version major && git push origin main --tags"
   },
   "keywords": [
     "utility",
