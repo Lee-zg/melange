@@ -38,9 +38,7 @@ export function capitalize(str: string): string {
  */
 export function camelCase(str: string): string {
   return str
-    .replace(/[\s_-]+(.)?/g, (_, char: string | undefined) =>
-      char ? char.toUpperCase() : ''
-    )
+    .replace(/[\s_-]+(.)?/g, (_, char: string | undefined) => (char ? char.toUpperCase() : ''))
     .replace(/^[A-Z]/, char => char.toLowerCase());
 }
 
@@ -134,11 +132,7 @@ export function constantCase(str: string): string {
  * @param suffix - 要添加的后缀（默认：'...'）
  * @returns 截断后的字符串
  */
-export function truncate(
-  str: string,
-  maxLength: number,
-  suffix: string = '...'
-): string {
+export function truncate(str: string, maxLength: number, suffix: string = '...'): string {
   if (str.length <= maxLength) return str;
   return str.slice(0, maxLength - suffix.length) + suffix;
 }
@@ -157,11 +151,7 @@ export function truncate(
  * @param padChar - 填充字符
  * @returns 填充后的字符串
  */
-export function padStart(
-  str: string,
-  length: number,
-  padChar: string = ' '
-): string {
+export function padStart(str: string, length: number, padChar: string = ' '): string {
   if (str.length >= length) return str;
   const padding = padChar.repeat(Math.ceil((length - str.length) / padChar.length));
   return (padding + str).slice(-length);
@@ -181,11 +171,7 @@ export function padStart(
  * @param padChar - 填充字符
  * @returns 填充后的字符串
  */
-export function padEnd(
-  str: string,
-  length: number,
-  padChar: string = ' '
-): string {
+export function padEnd(str: string, length: number, padChar: string = ' '): string {
   if (str.length >= length) return str;
   const padding = padChar.repeat(Math.ceil((length - str.length) / padChar.length));
   return (str + padding).slice(0, length);
@@ -252,10 +238,7 @@ export function unescapeHtml(str: string): string {
     '&apos;': "'",
   };
 
-  return str.replace(
-    /&(?:amp|lt|gt|quot|#39|apos);/g,
-    entity => htmlEntities[entity] ?? entity
-  );
+  return str.replace(/&(?:amp|lt|gt|quot|#39|apos);/g, entity => htmlEntities[entity] ?? entity);
 }
 
 /**

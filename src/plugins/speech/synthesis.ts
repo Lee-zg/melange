@@ -291,7 +291,7 @@ export class SpeechSynthesizerImpl implements SpeechSynthesizer {
    * 初始化语音合成器
    * @param config - 合成配置
    */
-  async initialize(config?: SynthesisConfig): Promise<void> {
+  initialize(config?: SynthesisConfig): Promise<void> {
     this._status = 'loading';
     this.config = {
       lang: 'zh-CN',
@@ -307,35 +307,35 @@ export class SpeechSynthesizerImpl implements SpeechSynthesizer {
       this.providers.set('browser', browserProvider);
 
       // 尝试使用首选提供商
-      const preferredProvider = this.config.preferredProvider || 'browser';
-      if (await this.tryProvider(preferredProvider)) {
+      const preferredProvider = this.config.preferredProvider ?? 'browser';
+      if (this.tryProvider(preferredProvider)) {
         this._status = 'ready';
-        return;
+        return Promise.resolve();
       }
 
       // 如果首选提供商不可用且启用了自动降级
       if (this.config.autoFallback && this.config.fallbackProviders) {
         for (const providerType of this.config.fallbackProviders) {
-          if (await this.tryProvider(providerType)) {
+          if (this.tryProvider(providerType)) {
             this._status = 'ready';
-            return;
+            return Promise.resolve();
           }
         }
       }
 
       // 所有提供商都不可用
       this._status = 'error';
-      throw new Error('没有可用的语音合成提供商');
+      return Promise.reject(new Error('没有可用的语音合成提供商'));
     } catch (error) {
       this._status = 'error';
-      throw error;
+      return Promise.reject(error);
     }
   }
 
   /**
    * 尝试使用指定提供商
    */
-  private async tryProvider(type: SpeechProviderType): Promise<boolean> {
+  private tryProvider(type: SpeechProviderType): boolean {
     const provider = this.providers.get(type);
     if (provider && provider.isAvailable()) {
       this.provider = provider;

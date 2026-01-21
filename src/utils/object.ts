@@ -102,10 +102,7 @@ export function deepMerge<T extends object>(...objects: Partial<T>[]): T {
       const sourceValue = (obj as Record<string, unknown>)[key];
 
       if (isPlainObject(targetValue) && isPlainObject(sourceValue)) {
-        result[key] = deepMerge(
-          targetValue as Record<string, unknown>,
-          sourceValue as Record<string, unknown>
-        );
+        result[key] = deepMerge(targetValue, sourceValue);
       } else {
         result[key] = deepClone(sourceValue);
       }
@@ -131,10 +128,7 @@ export function deepMerge<T extends object>(...objects: Partial<T>[]): T {
  * @param keys - 要选择的键
  * @returns 只包含指定键的新对象
  */
-export function pick<T extends object, K extends keyof T>(
-  obj: T,
-  keys: readonly K[]
-): Pick<T, K> {
+export function pick<T extends object, K extends keyof T>(obj: T, keys: readonly K[]): Pick<T, K> {
   const result = {} as Pick<T, K>;
 
   for (const key of keys) {
@@ -162,10 +156,7 @@ export function pick<T extends object, K extends keyof T>(
  * @param keys - 要省略的键
  * @returns 不包含指定键的新对象
  */
-export function omit<T extends object, K extends keyof T>(
-  obj: T,
-  keys: readonly K[]
-): Omit<T, K> {
+export function omit<T extends object, K extends keyof T>(obj: T, keys: readonly K[]): Omit<T, K> {
   const keysSet = new Set<keyof T>(keys);
   const result = {} as Omit<T, K>;
 
@@ -230,11 +221,7 @@ export function get<T = unknown>(
  * @param value - 要设置的值
  * @returns 修改后的对象
  */
-export function set<T extends object>(
-  obj: T,
-  path: string | readonly string[],
-  value: unknown
-): T {
+export function set<T extends object>(obj: T, path: string | readonly string[], value: unknown): T {
   const keys = typeof path === 'string' ? path.split('.') : path;
   let current: Record<string, unknown> = obj as Record<string, unknown>;
 
@@ -278,7 +265,7 @@ export function has(obj: unknown, path: string | readonly string[]): boolean {
     if (current == null || typeof current !== 'object') {
       return false;
     }
-    if (!(key in (current as object))) {
+    if (!(key in current)) {
       return false;
     }
     current = (current as Record<string, unknown>)[key];

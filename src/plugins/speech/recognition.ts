@@ -1432,8 +1432,7 @@ class CloudRecognitionStrategy extends BaseRecognitionStrategy {
       this.socket.onmessage = e => {
         try {
           const data = e.data as string | ArrayBuffer;
-          const raw =
-            typeof data === 'string' ? data : new TextDecoder().decode(data as ArrayBuffer);
+          const raw = typeof data === 'string' ? data : new TextDecoder().decode(data);
           const res = this.adapter.parseResult(JSON.parse(raw));
           if (res) {
             this.emit('result', res);
@@ -1595,7 +1594,7 @@ class CloudRecognitionStrategy extends BaseRecognitionStrategy {
       // 重采样 + 转换
       const resampled = AudioUtils.resample(input, currentRate, targetRate);
       const pcm = AudioUtils.floatTo16BitPCM(resampled);
-      this.handlePCM(pcm.buffer.slice(0) as ArrayBuffer);
+      this.handlePCM(pcm.buffer.slice(0));
     };
 
     source.connect(this.scriptProcessor);
@@ -1657,7 +1656,7 @@ class CloudRecognitionStrategy extends BaseRecognitionStrategy {
           code: 'NOT_ALLOWED',
           message: '页面已进入后台，录音已暂停',
         });
-        this.stop();
+        void this.stop();
       }
     };
     document.addEventListener('visibilitychange', this.visibilityHandler);
@@ -1686,7 +1685,7 @@ class CloudRecognitionStrategy extends BaseRecognitionStrategy {
 
         // 合并 & 编码 WAV
         const mergedPCM = AudioUtils.mergeBuffers(this.pcmChunks, this.totalPCMLength);
-        const sampleRate = this.config.audioConfig?.sampleRate || 16000;
+        const sampleRate = this.config.audioConfig?.sampleRate ?? 16000;
         const wavBuffer = AudioUtils.encodeWAV(mergedPCM, sampleRate);
 
         // 调用适配器识别
@@ -1737,7 +1736,7 @@ class CloudRecognitionStrategy extends BaseRecognitionStrategy {
     // 断开音频节点
     this.workletNode?.disconnect();
     this.scriptProcessor?.disconnect();
-    this.audioContext?.close();
+    void this.audioContext?.close();
 
     // 移除可见性监听
     if (this.visibilityHandler && typeof document !== 'undefined') {
@@ -1786,13 +1785,13 @@ export class SpeechRecognizerImpl implements SpeechRecognizer {
    * 获取当前识别状态
    */
   get recognitionStatus(): RecognitionStatus {
-    return this.strategy?.status || RecognitionStatus.IDLE;
+    return this.strategy?.status ?? RecognitionStatus.IDLE;
   }
 
   /**
    * 初始化语音识别器
    */
-  async initialize(config?: RecognitionConfig): Promise<void> {
+  initialize(config?: RecognitionConfig): Promise<void> {
     this._status = 'loading';
 
     // 合并配置
@@ -1817,20 +1816,21 @@ export class SpeechRecognizerImpl implements SpeechRecognizer {
     } as IAdvancedRecognitionConfig;
 
     try {
-      await this.initializeStrategy();
+      this.initializeStrategy();
       this._status = 'ready';
+      return Promise.resolve();
     } catch (error) {
       this._status = 'error';
-      throw error;
+      return Promise.reject(error);
     }
   }
 
   /**
    * 初始化识别策略
    */
-  private async initializeStrategy(): Promise<void> {
-    const advConfig = this.config as IAdvancedRecognitionConfig;
-    const mode = advConfig.mode || 'auto';
+  private initializeStrategy(): void {
+    const advConfig = this.config;
+    const mode = advConfig.mode ?? 'auto';
     const hasNative =
       typeof window !== 'undefined' &&
       ('SpeechRecognition' in window || 'webkitSpeechRecognition' in window);
@@ -1923,7 +1923,7 @@ export class SpeechRecognizerImpl implements SpeechRecognizer {
     if (config) {
       // 更新配置并重新初始化
       this.config = { ...this.config, ...config } as IAdvancedRecognitionConfig;
-      await this.initializeStrategy();
+      this.initializeStrategy();
     }
 
     return this.strategy?.start();
@@ -2001,8 +2001,8 @@ export class SpeechRecognizerImpl implements SpeechRecognizer {
    * 使用云端适配器
    */
   useCloudAdapter(adapter: ICloudRecognitionAdapter): void {
-    (this.config as IAdvancedRecognitionConfig).cloudAdapter = adapter;
-    (this.config as IAdvancedRecognitionConfig).mode = 'cloud';
+    this.config.cloudAdapter = adapter;
+    this.config.mode = 'cloud';
   }
 }
 

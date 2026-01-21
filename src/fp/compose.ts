@@ -64,9 +64,7 @@ export function compose(
     return fns[0] as UnaryFunction<unknown, unknown>;
   }
 
-  return fns.reduce(
-    (composed, fn) => (x: unknown) => composed(fn(x))
-  );
+  return fns.reduce((composed, fn) => (x: unknown) => composed(fn(x)));
 }
 
 /**
@@ -125,9 +123,7 @@ export function pipe(...fns: UnaryFunction<unknown, unknown>[]): UnaryFunction<u
     return fns[0] as UnaryFunction<unknown, unknown>;
   }
 
-  return fns.reduce(
-    (piped, fn) => (x: unknown) => fn(piped(x))
-  );
+  return fns.reduce((piped, fn) => (x: unknown) => fn(piped(x)));
 }
 
 /**

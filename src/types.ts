@@ -187,9 +187,7 @@ export type Dictionary<T> = Record<string, T>;
  * 表示深层部分类型
  * @template T - 基础类型
  */
-export type DeepPartial<T> = T extends object
-  ? { [P in keyof T]?: DeepPartial<T[P]> }
-  : T;
+export type DeepPartial<T> = T extends object ? { [P in keyof T]?: DeepPartial<T[P]> } : T;
 
 /**
  * 表示深层只读类型

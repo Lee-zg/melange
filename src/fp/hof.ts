@@ -207,9 +207,7 @@ export function not<T>(predicate: (value: T) => boolean): (value: T) => boolean 
  * @param predicates - 要检查的谓词数组
  * @returns 当所有谓词都通过时返回 true 的函数
  */
-export function allPass<T>(
-  predicates: Array<(value: T) => boolean>
-): (value: T) => boolean {
+export function allPass<T>(predicates: Array<(value: T) => boolean>): (value: T) => boolean {
   return (value: T) => predicates.every(predicate => predicate(value));
 }
 
@@ -231,9 +229,7 @@ export function allPass<T>(
  * @param predicates - 要检查的谓词数组
  * @returns 当任何谓词通过时返回 true 的函数
  */
-export function anyPass<T>(
-  predicates: Array<(value: T) => boolean>
-): (value: T) => boolean {
+export function anyPass<T>(predicates: Array<(value: T) => boolean>): (value: T) => boolean {
   return (value: T) => predicates.some(predicate => predicate(value));
 }
 
