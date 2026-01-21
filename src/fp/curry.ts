@@ -40,9 +40,7 @@ export function curry<A, B, R>(fn: (a: A, b: B) => R): (a: A) => (b: B) => R;
  * @param fn - 要柯里化的三元函数
  * @returns 函数的柯里化版本
  */
-export function curry<A, B, C, R>(
-  fn: (a: A, b: B, c: C) => R
-): (a: A) => (b: B) => (c: C) => R;
+export function curry<A, B, C, R>(fn: (a: A, b: B, c: C) => R): (a: A) => (b: B) => (c: C) => R;
 
 /**
  * 柯里化四元函数。
@@ -91,9 +89,7 @@ export function curry(fn: (...args: unknown[]) => unknown): unknown {
  * @returns 函数的反柯里化版本
  */
 export function uncurry<A, B, R>(fn: (a: A) => (b: B) => R): (a: A, b: B) => R;
-export function uncurry<A, B, C, R>(
-  fn: (a: A) => (b: B) => (c: C) => R
-): (a: A, b: B, c: C) => R;
+export function uncurry<A, B, C, R>(fn: (a: A) => (b: B) => (c: C) => R): (a: A, b: B, c: C) => R;
 
 export function uncurry(fn: (a: unknown) => unknown): (...args: unknown[]) => unknown {
   return (...args: unknown[]) => {

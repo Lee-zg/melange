@@ -117,10 +117,7 @@ export function fromNullable<T>(value: T | null | undefined): Option<T> {
  * @param fn - 要应用于值的函数
  * @returns 带有映射值的新 Option
  */
-export function mapOption<T, U>(
-  option: Option<T>,
-  fn: UnaryFunction<T, U>
-): Option<U> {
+export function mapOption<T, U>(option: Option<T>, fn: UnaryFunction<T, U>): Option<U> {
   if (isSome(option)) {
     return some(fn(option.value));
   }
@@ -151,10 +148,7 @@ export function mapOption<T, U>(
  * @param fn - 应用的返回 Option 的函数
  * @returns 展平后的 Option
  */
-export function flatMapOption<T, U>(
-  option: Option<T>,
-  fn: UnaryFunction<T, Option<U>>
-): Option<U> {
+export function flatMapOption<T, U>(option: Option<T>, fn: UnaryFunction<T, Option<U>>): Option<U> {
   if (isSome(option)) {
     return fn(option.value);
   }
@@ -274,10 +268,7 @@ export function toNullable<T>(option: Option<T>): T | null {
  * @param predicate - 谓词函数
  * @returns 如果谓词通过则返回 Option，否则返回 None
  */
-export function filterOption<T>(
-  option: Option<T>,
-  predicate: (value: T) => boolean
-): Option<T> {
+export function filterOption<T>(option: Option<T>, predicate: (value: T) => boolean): Option<T> {
   if (isSome(option) && predicate(option.value)) {
     return option;
   }

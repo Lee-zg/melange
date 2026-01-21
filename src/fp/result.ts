@@ -103,10 +103,7 @@ export function isErr<T, E>(result: Result<T, E>): result is Err<E> {
  * @param fn - 要应用于成功值的函数
  * @returns 带有映射值的新 Result
  */
-export function mapResult<T, U, E>(
-  result: Result<T, E>,
-  fn: UnaryFunction<T, U>
-): Result<U, E> {
+export function mapResult<T, U, E>(result: Result<T, E>, fn: UnaryFunction<T, U>): Result<U, E> {
   if (isOk(result)) {
     return ok(fn(result.value));
   }
@@ -190,10 +187,7 @@ export function unwrapOr<T, E>(result: Result<T, E>, defaultValue: T): T {
  * @param fn - 如果为 Err 要调用的函数
  * @returns 成功值或函数的结果
  */
-export function unwrapOrElse<T, E>(
-  result: Result<T, E>,
-  fn: UnaryFunction<E, T>
-): T {
+export function unwrapOrElse<T, E>(result: Result<T, E>, fn: UnaryFunction<E, T>): T {
   if (isOk(result)) {
     return result.value;
   }
@@ -269,9 +263,7 @@ export function tryCatch<T>(fn: () => T): Result<T, unknown> {
  * @param fn - 要执行的异步函数
  * @returns 包含返回值或错误的 Result 的 Promise
  */
-export async function tryCatchAsync<T>(
-  fn: () => Promise<T>
-): Promise<Result<T, unknown>> {
+export async function tryCatchAsync<T>(fn: () => Promise<T>): Promise<Result<T, unknown>> {
   try {
     const result = await fn();
     return ok(result);

@@ -121,10 +121,7 @@ export function debounce<T extends AnyFunction>(
  * @param limit - 调用之间的最小时间
  * @returns 函数的节流版本
  */
-export function throttle<T extends AnyFunction>(
-  fn: T,
-  limit: number
-): T & { cancel: () => void } {
+export function throttle<T extends AnyFunction>(fn: T, limit: number): T & { cancel: () => void } {
   let lastCall = 0;
   let timeoutId: ReturnType<typeof setTimeout> | null = null;
   let lastArgs: Parameters<T> | null = null;
@@ -226,12 +223,7 @@ export async function retry<T>(
     onRetry?: (error: unknown, attempt: number) => void;
   }
 ): Promise<T> {
-  const {
-    maxRetries = 3,
-    delay: retryDelay = 1000,
-    backoff = 'none',
-    onRetry,
-  } = options ?? {};
+  const { maxRetries = 3, delay: retryDelay = 1000, backoff = 'none', onRetry } = options ?? {};
 
   let lastError: unknown;
 
@@ -279,11 +271,7 @@ export async function retry<T>(
  * @param errorMessage - 可选的自定义错误消息
  * @returns 如果超过超时时间则拒绝的承诺
  */
-export function timeout<T>(
-  promise: Promise<T>,
-  ms: number,
-  errorMessage?: string
-): Promise<T> {
+export function timeout<T>(promise: Promise<T>, ms: number, errorMessage?: string): Promise<T> {
   let timeoutId: ReturnType<typeof setTimeout>;
 
   const timeoutPromise = new Promise<never>((_, reject) => {
@@ -366,10 +354,7 @@ export async function parallel<T>(
     }
   }
 
-  const workers = Array.from(
-    { length: Math.min(concurrency, tasks.length) },
-    () => runNext()
-  );
+  const workers = Array.from({ length: Math.min(concurrency, tasks.length) }, () => runNext());
 
   await Promise.all(workers);
   return results;
@@ -391,9 +376,7 @@ export async function parallel<T>(
  * @param tasks - 异步任务函数数组
  * @returns 结果数组
  */
-export async function sequence<T>(
-  tasks: Array<() => Promise<T>>
-): Promise<T[]> {
+export async function sequence<T>(tasks: Array<() => Promise<T>>): Promise<T[]> {
   const results: T[] = [];
 
   for (const task of tasks) {

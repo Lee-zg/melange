@@ -16,14 +16,7 @@ export type { EventMap } from './events';
 // 依赖注入
 // ============================================================================
 
-export {
-  Container,
-  globalContainer,
-  Lifecycle,
-  Injectable,
-  Inject,
-  Singleton,
-} from './container';
+export { Container, globalContainer, Lifecycle, Injectable, Inject, Singleton } from './container';
 
 export type { Token, Factory } from './container';
 
@@ -49,11 +42,6 @@ export {
 // 资源管理
 // ============================================================================
 
-export {
-  Disposable,
-  DisposableStore,
-  toDisposable,
-  combineDisposables,
-} from './disposable';
+export { Disposable, DisposableStore, toDisposable, combineDisposables } from './disposable';
 
 export type { IDisposable } from './disposable';

@@ -245,9 +245,7 @@ export function Log(
  * @param validator - 在输入无效时抛出异常的验证函数
  * @returns 方法装饰器
  */
-export function Validate(
-  validator: (...args: unknown[]) => void
-): MethodDecorator {
+export function Validate(validator: (...args: unknown[]) => void): MethodDecorator {
   return function (
     _target: object,
     _propertyKey: string | symbol,
@@ -420,10 +418,7 @@ export function Retry(maxRetries: number, delayMs: number = 0): MethodDecorator 
   ): PropertyDescriptor {
     const originalMethod = descriptor.value as (...args: unknown[]) => unknown;
 
-    descriptor.value = async function (
-      this: unknown,
-      ...args: unknown[]
-    ): Promise<unknown> {
+    descriptor.value = async function (this: unknown, ...args: unknown[]): Promise<unknown> {
       let lastError: unknown;
 
       for (let attempt = 0; attempt <= maxRetries; attempt++) {
@@ -463,10 +458,7 @@ export function Retry(maxRetries: number, delayMs: number = 0): MethodDecorator 
  * @param errorMessage - 可选的错误消息
  * @returns 方法装饰器
  */
-export function Timeout(
-  timeoutMs: number,
-  errorMessage?: string
-): MethodDecorator {
+export function Timeout(timeoutMs: number, errorMessage?: string): MethodDecorator {
   return function (
     _target: object,
     propertyKey: string | symbol,
@@ -475,15 +467,10 @@ export function Timeout(
     const originalMethod = descriptor.value as (...args: unknown[]) => Promise<unknown>;
     const methodName = String(propertyKey);
 
-    descriptor.value = async function (
-      this: unknown,
-      ...args: unknown[]
-    ): Promise<unknown> {
+    descriptor.value = async function (this: unknown, ...args: unknown[]): Promise<unknown> {
       const timeoutPromise = new Promise<never>((_, reject) => {
         setTimeout(() => {
-          reject(
-            new Error(errorMessage ?? `${methodName} timed out after ${timeoutMs}ms`)
-          );
+          reject(new Error(errorMessage ?? `${methodName} timed out after ${timeoutMs}ms`));
         }, timeoutMs);
       });
 

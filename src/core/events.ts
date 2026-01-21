@@ -85,10 +85,7 @@ export class EventEmitter<Events extends EventMap = EventMap> {
    * @param handler - 事件发射时要调用的处理函数
    * @returns 带有取消订阅方法的订阅对象
    */
-  public on<K extends keyof Events>(
-    event: K,
-    handler: EventHandler<Events[K]>
-  ): Subscription {
+  public on<K extends keyof Events>(event: K, handler: EventHandler<Events[K]>): Subscription {
     return this.addListener(event, handler, false);
   }
 
@@ -100,10 +97,7 @@ export class EventEmitter<Events extends EventMap = EventMap> {
    * @param handler - 事件发射时要调用的处理函数
    * @returns 带有取消订阅方法的订阅对象
    */
-  public once<K extends keyof Events>(
-    event: K,
-    handler: EventHandler<Events[K]>
-  ): Subscription {
+  public once<K extends keyof Events>(event: K, handler: EventHandler<Events[K]>): Subscription {
     return this.addListener(event, handler, true);
   }
 
@@ -113,10 +107,7 @@ export class EventEmitter<Events extends EventMap = EventMap> {
    * @param event - 事件名称
    * @param handler - 要移除的处理函数
    */
-  public off<K extends keyof Events>(
-    event: K,
-    handler: EventHandler<Events[K]>
-  ): void {
+  public off<K extends keyof Events>(event: K, handler: EventHandler<Events[K]>): void {
     const eventListeners = this.listeners.get(event);
     if (eventListeners) {
       const index = eventListeners.findIndex(entry => entry.handler === handler);
