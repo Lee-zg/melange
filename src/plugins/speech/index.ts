@@ -95,4 +95,17 @@ export {
   createSpeechRecognizer,
   isSpeechRecognitionSupported,
   listen,
+  listenWithTimeout,
+  // 状态枚举
+  RecognitionStatus,
+  // 音频工具
+  AudioUtils,
+  // 云端适配器
+  GenericAdapter,
+  XunfeiAdapter,
+  TencentAdapter,
+  BaiduAdapter,
+  AlibabaAdapter,
+  GoogleAdapter,
+  AzureAdapter,
 } from './recognition';

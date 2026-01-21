@@ -58,13 +58,13 @@ class BrowserSynthesisProvider implements SynthesisProvider {
       return this.voicesPromise;
     }
 
-    this.voicesPromise = new Promise((resolve) => {
+    this.voicesPromise = new Promise(resolve => {
       const loadVoices = () => {
         const voices = this.synthesis!.getVoices();
         if (voices.length > 0) {
           this.voicesLoaded = true;
           resolve(
-            voices.map((voice) => ({
+            voices.map(voice => ({
               id: voice.voiceURI,
               name: voice.name,
               lang: voice.lang,
@@ -121,8 +121,8 @@ class BrowserSynthesisProvider implements SynthesisProvider {
           const voiceConfig = config.voice;
           const targetVoice =
             typeof voiceConfig === 'string'
-              ? voices.find((v) => v.name === voiceConfig || v.voiceURI === voiceConfig)
-              : voices.find((v) => v.voiceURI === voiceConfig.id);
+              ? voices.find(v => v.name === voiceConfig || v.voiceURI === voiceConfig)
+              : voices.find(v => v.voiceURI === voiceConfig.id);
           if (targetVoice) {
             utterance.voice = targetVoice;
           }
@@ -147,7 +147,7 @@ class BrowserSynthesisProvider implements SynthesisProvider {
         this.emit('resume', { type: 'resume' });
       };
 
-      utterance.onboundary = (event) => {
+      utterance.onboundary = event => {
         this.emit('boundary', {
           type: 'boundary',
           charIndex: event.charIndex,
@@ -157,14 +157,14 @@ class BrowserSynthesisProvider implements SynthesisProvider {
         });
       };
 
-      utterance.onmark = (event) => {
+      utterance.onmark = event => {
         this.emit('mark', {
           type: 'mark',
           name: event.name,
         });
       };
 
-      utterance.onerror = (event) => {
+      utterance.onerror = event => {
         const error = this.createError(event.error, `语音合成错误: ${event.error}`);
         this.emit('error', { type: 'error', error });
         reject(error);
@@ -236,7 +236,7 @@ class BrowserSynthesisProvider implements SynthesisProvider {
    * 触发事件
    */
   private emit(type: SynthesisEventType, event: SynthesisEvent): void {
-    this.eventHandlers.get(type)?.forEach((handler) => {
+    this.eventHandlers.get(type)?.forEach(handler => {
       try {
         handler(event);
       } catch (e) {
@@ -362,8 +362,8 @@ export class SpeechSynthesizerImpl implements SpeechSynthesizer {
       'mark',
       'error',
     ];
-    events.forEach((event) => {
-      provider.on(event, (e) => this.emit(event, e));
+    events.forEach(event => {
+      provider.on(event, e => this.emit(event, e));
     });
   }
 
@@ -447,7 +447,7 @@ export class SpeechSynthesizerImpl implements SpeechSynthesizer {
    * 触发事件
    */
   private emit(type: SynthesisEventType, event: SynthesisEvent): void {
-    this.eventHandlers.get(type)?.forEach((handler) => {
+    this.eventHandlers.get(type)?.forEach(handler => {
       try {
         handler(event);
       } catch (e) {
