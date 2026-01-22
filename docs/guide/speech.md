@@ -64,6 +64,186 @@ synthesizer.dispose();
 | `rate` | `number` | `1.0` | 语速 (0.1-10) |
 | `pitch` | `number` | `1.0` | 音调 (0-2) |
 
+### 云端语音合成
+
+语音合成支持两种模式：
+
+- **原生模式**：使用浏览器 Web Speech API (默认)
+- **云端模式**：支持 Azure、Google、AWS、讯飞、腾讯、百度、阿里云等第三方服务
+
+#### 使用 Azure 语音合成
+
+```typescript
+import { createSpeechSynthesizer, AzureSynthesisAdapter } from 'melange/plugins';
+
+// 创建 Azure 适配器
+const adapter = new AzureSynthesisAdapter(
+  'your-subscription-key',
+  'eastasia',              // 服务区域
+  'zh-CN-XiaoxiaoNeural'   // 默认语音
+);
+
+// 创建合成器
+const synthesizer = await createSpeechSynthesizer({
+  mode: 'cloud',
+  cloudAdapter: adapter,
+});
+
+// 监听事件
+synthesizer.on('start', () => console.log('开始朗读'));
+synthesizer.on('end', () => console.log('朗读结束'));
+synthesizer.on('error', (e) => console.error('错误:', e.error));
+
+// 朗读文本
+await synthesizer.speak('你好，我是小晓，很高兴为您服务！');
+
+// 销毁实例
+synthesizer.dispose();
+```
+
+#### 使用 Google Cloud TTS
+
+```typescript
+import { createSpeechSynthesizer, GoogleSynthesisAdapter } from 'melange/plugins';
+
+const adapter = new GoogleSynthesisAdapter(
+  'your-api-key',
+  'zh-CN-Wavenet-A'
+);
+
+const synthesizer = await createSpeechSynthesizer({
+  mode: 'cloud',
+  cloudAdapter: adapter,
+});
+
+await synthesizer.speak('Google 语音合成示例');
+synthesizer.dispose();
+```
+
+#### 使用百度语音合成
+
+```typescript
+import { createSpeechSynthesizer, BaiduSynthesisAdapter } from 'melange/plugins';
+
+// 百度语音合成需要 access_token
+// 生产环境建议通过后端获取
+const adapter = new BaiduSynthesisAdapter(
+  'your-access-token',
+  '0'  // 语音: 0=度小美, 1=度小宇, 3=度逍遥, 4=度丫丫
+);
+
+const synthesizer = await createSpeechSynthesizer({
+  mode: 'cloud',
+  cloudAdapter: adapter,
+});
+
+await synthesizer.speak('百度语音合成示例');
+synthesizer.dispose();
+```
+
+#### 使用讯飞语音合成
+
+```typescript
+import { createSpeechSynthesizer, XunfeiSynthesisAdapter } from 'melange/plugins';
+
+const adapter = new XunfeiSynthesisAdapter(
+  'your-app-id',
+  'your-api-key',     // 可选，生产环境建议后端签名
+  'your-api-secret',  // 可选
+  'xiaoyan'           // 语音: xiaoyan, aisjiuxu, aisxping, aisjinger
+);
+
+const synthesizer = await createSpeechSynthesizer({
+  mode: 'cloud',
+  cloudAdapter: adapter,
+});
+
+await synthesizer.speak('讯飞语音合成示例');
+synthesizer.dispose();
+```
+
+#### 使用腾讯云语音合成
+
+```typescript
+import { createSpeechSynthesizer, TencentSynthesisAdapter } from 'melange/plugins';
+
+const adapter = new TencentSynthesisAdapter(
+  'your-secret-id',
+  'your-secret-key',
+  '101001'  // 语音类型
+);
+
+const synthesizer = await createSpeechSynthesizer({
+  mode: 'cloud',
+  cloudAdapter: adapter,
+});
+
+await synthesizer.speak('腾讯云语音合成示例');
+synthesizer.dispose();
+```
+
+#### 使用阿里云语音合成
+
+```typescript
+import { createSpeechSynthesizer, AlibabaSynthesisAdapter } from 'melange/plugins';
+
+const adapter = new AlibabaSynthesisAdapter(
+  'your-access-key-id',
+  'your-access-key-secret',
+  'your-app-key',
+  'xiaoyun'  // 语音: xiaoyun, xiaogang, ruoxi, siqi
+);
+
+const synthesizer = await createSpeechSynthesizer({
+  mode: 'cloud',
+  cloudAdapter: adapter,
+});
+
+await synthesizer.speak('阿里云语音合成示例');
+synthesizer.dispose();
+```
+
+#### 自定义 BFF 适配器
+
+推荐使用 BFF 模式，通过自己的后端代理调用云服务：
+
+```typescript
+import { createSpeechSynthesizer, GenericSynthesisAdapter } from 'melange/plugins';
+
+const adapter = new GenericSynthesisAdapter('https://api.yoursite.com/tts');
+
+const synthesizer = await createSpeechSynthesizer({
+  mode: 'cloud',
+  cloudAdapter: adapter,
+});
+
+await synthesizer.speak('使用自定义 BFF 后端合成');
+synthesizer.dispose();
+```
+
+### 快速云端朗读
+
+```typescript
+import { speakWithCloud, AzureSynthesisAdapter } from 'melange/plugins';
+
+const adapter = new AzureSynthesisAdapter('key', 'eastasia');
+
+// 一行代码完成云端语音合成
+await speakWithCloud('快速云端语音合成示例', adapter, {
+  rate: 1.2,
+  volume: 0.9,
+});
+```
+
+### 语音合成高级配置
+
+| 选项 | 类型 | 默认值 | 描述 |
+|------|------|--------|------|
+| `mode` | `'native' \| 'cloud' \| 'auto'` | `'auto'` | 合成引擎模式 |
+| `cloudAdapter` | `ICloudSynthesisAdapter` | - | 云端适配器 |
+| `audioFormat` | `'mp3' \| 'wav' \| 'ogg' \| 'pcm'` | `'mp3'` | 音频格式 |
+| `enableSSML` | `boolean` | `false` | 是否启用 SSML |
+
 ## 语音识别 (STT)
 
 语音识别支持两种模式：
