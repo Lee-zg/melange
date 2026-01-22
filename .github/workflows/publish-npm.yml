@@ -38,13 +38,13 @@ jobs:
       - name: Type check
         run: npm run typecheck
 
-  # 发布到 npmjs.com (使用 OIDC Trusted Publishing)
+  # 发布到 npmjs.com
   publish-npm:
     needs: test
     runs-on: ubuntu-latest
     permissions:
       contents: read
-      id-token: write # 用于 npm OIDC trusted publishing
+      id-token: write # 用于 npm provenance
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -62,8 +62,10 @@ jobs:
       - name: Build
         run: npm run build
 
-      - name: Publish to npm with provenance
+      - name: Publish to npm
         run: npm publish --provenance --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
   # 发布到 GitHub Packages
   publish-gpr:
