@@ -5,10 +5,10 @@
 </p>
 
 <p align="center">
-  <img alt="npm version" src="https://img.shields.io/npm/v/melange">
-  <img alt="License" src="https://img.shields.io/npm/l/melange">
+  <img alt="npm version" src="https://img.shields.io/npm/v/@lee-zg/melange">
+  <img alt="License" src="https://img.shields.io/npm/l/@lee-zg/melange">
   <img alt="TypeScript" src="https://img.shields.io/badge/TypeScript-5.0+-blue">
-  <img alt="Bundle Size" src="https://img.shields.io/bundlephobia/minzip/melange">
+  <img alt="Bundle Size" src="https://img.shields.io/bundlephobia/minzip/@lee-zg/melange">
 </p>
 
 ## 特性
@@ -25,19 +25,19 @@
 
 ```bash
 # npm
-npm install melange
+npm install @lee-zg/melange
 
 # yarn
-yarn add melange
+yarn add @lee-zg/melange
 
 # pnpm
-pnpm add melange
+pnpm add @lee-zg/melange
 ```
 
 ## 快速开始
 
 ```typescript
-import { pipe, curry, debounce, EventEmitter } from 'melange';
+import { pipe, curry, debounce, EventEmitter } from '@lee-zg/melange';
 
 // 函数式编程
 const result = pipe(
@@ -68,7 +68,7 @@ emitter.emit('message', 'Hello, World!');
 
 Melange 组织为三个主要模块：
 
-### 函数式编程 (`melange/fp`)
+### 函数式编程 (`@lee-zg/melange/fp`)
 
 ```typescript
 import { 
@@ -77,10 +77,10 @@ import {
   ok, err, mapResult,            // Result 类型（错误处理）
   some, none, mapOption,         // Option 类型（可空值处理）
   memoize, once, identity        // 高阶函数
-} from 'melange/fp';
+} from '@lee-zg/melange/fp';
 ```
 
-### 实用工具 (`melange/utils`)
+### 实用工具 (`@lee-zg/melange/utils`)
 
 ```typescript
 import {
@@ -89,10 +89,10 @@ import {
   camelCase, snakeCase, truncate,        // 字符串工具
   debounce, throttle, delay, retry,      // 计时工具
   isString, isNumber, isEmail            // 类型守卫
-} from 'melange/utils';
+} from '@lee-zg/melange/utils';
 ```
 
-### 核心面向对象 (`melange/core`)
+### 核心面向对象 (`@lee-zg/melange/core`)
 
 ```typescript
 import {
@@ -100,7 +100,7 @@ import {
   Container, Injectable, Inject,         // 依赖注入
   Memoize, Debounce, Throttle, Log,     // 方法装饰器
   Disposable, DisposableStore            // 资源管理
-} from 'melange/core';
+} from '@lee-zg/melange/core';
 ```
 
 ## API 参考
@@ -234,7 +234,7 @@ import type {
   Predicate, Mapper, Reducer,
   DeepPartial, DeepReadonly,
   Brand, NonEmptyString, Email
-} from 'melange';
+} from '@lee-zg/melange';
 ```
 
 ## 浏览器支持

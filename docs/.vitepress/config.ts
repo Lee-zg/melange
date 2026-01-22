@@ -1,4 +1,5 @@
 import { defineConfig } from 'vitepress';
+import pkg from '../../package.json';
 
 /**
  * VitePress 配置
@@ -47,7 +48,7 @@ export default defineConfig({
         ],
       },
       {
-        text: '1.0.0',
+        text: `v${pkg.version}`,
         items: [
           { text: '更新日志', link: '/changelog' },
           { text: 'GitHub', link: 'https://github.com/Lee-zg/melange' },
