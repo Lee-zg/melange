@@ -875,3 +875,485 @@ describe('Integration Scenarios', () => {
     expect(wav.byteLength).toBe(44 + pcm.length * 2);
   });
 });
+
+// ============================================================================
+// SPEECH SYNTHESIS TESTS
+// ============================================================================
+
+import {
+  SynthesisStatus,
+  SynthesisAudioUtils,
+  GenericSynthesisAdapter,
+  AzureSynthesisAdapter,
+  GoogleSynthesisAdapter,
+  AWSSynthesisAdapter,
+  XunfeiSynthesisAdapter,
+  TencentSynthesisAdapter,
+  BaiduSynthesisAdapter,
+  AlibabaSynthesisAdapter,
+  SpeechSynthesizerImpl,
+  isSpeechSynthesisSupported,
+  type IAdvancedSynthesisConfig,
+  type ISynthesisResult,
+} from '../src/plugins/speech/synthesis';
+
+// ============================================================================
+// 9. SynthesisStatus 状态枚举测试
+// ============================================================================
+
+describe('SynthesisStatus', () => {
+  it('should have IDLE status', () => {
+    expect(SynthesisStatus.IDLE).toBe('IDLE');
+  });
+
+  it('should have LOADING status', () => {
+    expect(SynthesisStatus.LOADING).toBe('LOADING');
+  });
+
+  it('should have SPEAKING status', () => {
+    expect(SynthesisStatus.SPEAKING).toBe('SPEAKING');
+  });
+
+  it('should have PAUSED status', () => {
+    expect(SynthesisStatus.PAUSED).toBe('PAUSED');
+  });
+
+  it('should have 4 status values', () => {
+    const statusValues = Object.values(SynthesisStatus);
+    expect(statusValues.length).toBe(4);
+  });
+});
+
+// ============================================================================
+// 10. SynthesisAudioUtils 音频工具测试
+// ============================================================================
+
+describe('SynthesisAudioUtils', () => {
+  describe('arrayBufferToBase64', () => {
+    it('should convert ArrayBuffer to Base64', () => {
+      const str = 'Hello, World!';
+      const encoder = new TextEncoder();
+      const buffer = encoder.encode(str).buffer;
+
+      const base64 = SynthesisAudioUtils.arrayBufferToBase64(buffer);
+      expect(base64).toBe('SGVsbG8sIFdvcmxkIQ==');
+    });
+
+    it('should handle empty buffer', () => {
+      const buffer = new ArrayBuffer(0);
+      const base64 = SynthesisAudioUtils.arrayBufferToBase64(buffer);
+      expect(base64).toBe('');
+    });
+  });
+
+  describe('base64ToArrayBuffer', () => {
+    it('should convert Base64 to ArrayBuffer', () => {
+      const base64 = 'SGVsbG8sIFdvcmxkIQ==';
+      const buffer = SynthesisAudioUtils.base64ToArrayBuffer(base64);
+
+      const decoder = new TextDecoder();
+      const text = decoder.decode(buffer);
+      expect(text).toBe('Hello, World!');
+    });
+
+    it('should handle empty string', () => {
+      const buffer = SynthesisAudioUtils.base64ToArrayBuffer('');
+      expect(buffer.byteLength).toBe(0);
+    });
+
+    it('should round-trip correctly', () => {
+      const original = 'Test data 123!';
+      const encoder = new TextEncoder();
+      const originalBuffer = encoder.encode(original).buffer;
+
+      const base64 = SynthesisAudioUtils.arrayBufferToBase64(originalBuffer);
+      const decoded = SynthesisAudioUtils.base64ToArrayBuffer(base64);
+
+      const decoder = new TextDecoder();
+      expect(decoder.decode(decoded)).toBe(original);
+    });
+  });
+
+  describe('estimateDuration', () => {
+    it('should estimate mp3 duration', () => {
+      const byteLength = 16000; // 16KB
+      const duration = SynthesisAudioUtils.estimateDuration(byteLength, 'mp3');
+      // 16000 * 8 / 128000 * 1000 = 1000ms
+      expect(duration).toBe(1000);
+    });
+
+    it('should estimate wav duration', () => {
+      const byteLength = 32000; // 32KB
+      const duration = SynthesisAudioUtils.estimateDuration(byteLength, 'wav');
+      // 32000 * 8 / 256000 * 1000 = 1000ms
+      expect(duration).toBe(1000);
+    });
+
+    it('should estimate ogg duration', () => {
+      const byteLength = 12000; // 12KB
+      const duration = SynthesisAudioUtils.estimateDuration(byteLength, 'ogg');
+      // 12000 * 8 / 96000 * 1000 = 1000ms
+      expect(duration).toBe(1000);
+    });
+
+    it('should estimate pcm duration', () => {
+      const byteLength = 32000; // 32KB
+      const duration = SynthesisAudioUtils.estimateDuration(byteLength, 'pcm');
+      // 32000 * 8 / 256000 * 1000 = 1000ms
+      expect(duration).toBe(1000);
+    });
+  });
+});
+
+// ============================================================================
+// 11. Cloud Synthesis Adapters 适配器测试
+// ============================================================================
+
+describe('Cloud Synthesis Adapters', () => {
+  describe('GenericSynthesisAdapter', () => {
+    const adapter = new GenericSynthesisAdapter('https://api.example.com');
+
+    it('should have correct name', () => {
+      expect(adapter.name).toBe('Generic/BFF');
+    });
+  });
+
+  describe('AzureSynthesisAdapter', () => {
+    const adapter = new AzureSynthesisAdapter('test-key', 'eastasia');
+
+    it('should have correct name', () => {
+      expect(adapter.name).toBe('Azure');
+    });
+  });
+
+  describe('GoogleSynthesisAdapter', () => {
+    const adapter = new GoogleSynthesisAdapter('test-api-key');
+
+    it('should have correct name', () => {
+      expect(adapter.name).toBe('Google');
+    });
+  });
+
+  describe('AWSSynthesisAdapter', () => {
+    const adapter = new AWSSynthesisAdapter('access-id', 'secret-key', 'us-east-1');
+
+    it('should have correct name', () => {
+      expect(adapter.name).toBe('AWS');
+    });
+
+    it('should return static voice list', async () => {
+      const voices = await adapter.getVoices();
+      expect(voices.length).toBeGreaterThan(0);
+      expect(voices[0]?.provider).toBe('AWS');
+    });
+  });
+
+  describe('XunfeiSynthesisAdapter', () => {
+    const adapter = new XunfeiSynthesisAdapter('test-app-id');
+
+    it('should have correct name', () => {
+      expect(adapter.name).toBe('Xunfei');
+    });
+
+    it('should return static voice list', async () => {
+      const voices = await adapter.getVoices();
+      expect(voices.length).toBe(4);
+      expect(voices[0]?.id).toBe('xiaoyan');
+      expect(voices[0]?.provider).toBe('Xunfei');
+    });
+  });
+
+  describe('TencentSynthesisAdapter', () => {
+    const adapter = new TencentSynthesisAdapter('secret-id', 'secret-key');
+
+    it('should have correct name', () => {
+      expect(adapter.name).toBe('Tencent');
+    });
+
+    it('should return static voice list', async () => {
+      const voices = await adapter.getVoices();
+      expect(voices.length).toBe(3);
+      expect(voices[0]?.id).toBe('101001');
+      expect(voices[0]?.provider).toBe('Tencent');
+    });
+  });
+
+  describe('BaiduSynthesisAdapter', () => {
+    const adapter = new BaiduSynthesisAdapter('test-token');
+
+    it('should have correct name', () => {
+      expect(adapter.name).toBe('Baidu');
+    });
+
+    it('should return static voice list', async () => {
+      const voices = await adapter.getVoices();
+      expect(voices.length).toBe(4);
+      expect(voices[0]?.id).toBe('0');
+      expect(voices[0]?.name).toBe('度小美');
+      expect(voices[0]?.provider).toBe('Baidu');
+    });
+  });
+
+  describe('AlibabaSynthesisAdapter', () => {
+    const adapter = new AlibabaSynthesisAdapter('access-key', 'secret', 'app-key');
+
+    it('should have correct name', () => {
+      expect(adapter.name).toBe('Alibaba');
+    });
+
+    it('should return static voice list', async () => {
+      const voices = await adapter.getVoices();
+      expect(voices.length).toBe(4);
+      expect(voices[0]?.id).toBe('xiaoyun');
+      expect(voices[0]?.provider).toBe('Alibaba');
+    });
+  });
+});
+
+// ============================================================================
+// 12. SpeechSynthesizerImpl 主类测试
+// ============================================================================
+
+describe('SpeechSynthesizerImpl', () => {
+  let synthesizer: SpeechSynthesizerImpl;
+
+  beforeEach(() => {
+    synthesizer = new SpeechSynthesizerImpl();
+  });
+
+  afterEach(() => {
+    synthesizer.dispose();
+  });
+
+  describe('Initial State', () => {
+    it('should have idle status initially', () => {
+      expect(synthesizer.status).toBe('idle');
+    });
+
+    it('should have browser as default provider', () => {
+      expect(synthesizer.currentProvider).toBe('browser');
+    });
+
+    it('should have IDLE synthesis status', () => {
+      expect(synthesizer.synthesisStatus).toBe(SynthesisStatus.IDLE);
+    });
+
+    it('should not be speaking initially', () => {
+      expect(synthesizer.isSpeaking()).toBe(false);
+    });
+
+    it('should not be paused initially', () => {
+      expect(synthesizer.isPaused()).toBe(false);
+    });
+  });
+
+  describe('Event System', () => {
+    it('should register and trigger event handlers', () => {
+      const handler = vi.fn();
+      synthesizer.on('start', handler);
+
+      // Manually trigger internal event (simulating)
+      const eventMap = (synthesizer as unknown as { eventHandlers: Map<string, Set<Function>> })
+        .eventHandlers;
+      eventMap.get('start')?.forEach(h => h({ type: 'start' }));
+
+      expect(handler).toHaveBeenCalledOnce();
+    });
+
+    it('should remove event handlers', () => {
+      const handler = vi.fn();
+      synthesizer.on('start', handler);
+      synthesizer.off('start', handler);
+
+      const eventMap = (synthesizer as unknown as { eventHandlers: Map<string, Set<Function>> })
+        .eventHandlers;
+      eventMap.get('start')?.forEach(h => h({ type: 'start' }));
+
+      expect(handler).not.toHaveBeenCalled();
+    });
+
+    it('should support multiple handlers for same event', () => {
+      const handler1 = vi.fn();
+      const handler2 = vi.fn();
+
+      synthesizer.on('end', handler1);
+      synthesizer.on('end', handler2);
+
+      const eventMap = (synthesizer as unknown as { eventHandlers: Map<string, Set<Function>> })
+        .eventHandlers;
+      eventMap.get('end')?.forEach(h => h({ type: 'end' }));
+
+      expect(handler1).toHaveBeenCalledOnce();
+      expect(handler2).toHaveBeenCalledOnce();
+    });
+  });
+
+  describe('Dispose', () => {
+    it('should reset status on dispose', () => {
+      synthesizer.dispose();
+      expect(synthesizer.status).toBe('idle');
+    });
+
+    it('should clear event handlers on dispose', () => {
+      const handler = vi.fn();
+      synthesizer.on('start', handler);
+      synthesizer.dispose();
+
+      const eventMap = (synthesizer as unknown as { eventHandlers: Map<string, Set<Function>> })
+        .eventHandlers;
+      expect(eventMap.size).toBe(0);
+    });
+  });
+
+  describe('Cloud Adapter Integration', () => {
+    it('should accept cloud adapter via useCloudAdapter', () => {
+      const adapter = new GenericSynthesisAdapter('https://api.example.com');
+      synthesizer.useCloudAdapter(adapter);
+
+      const config = (synthesizer as unknown as { config: IAdvancedSynthesisConfig }).config;
+      expect(config.cloudAdapter).toBe(adapter);
+      expect(config.mode).toBe('cloud');
+    });
+  });
+});
+
+// ============================================================================
+// 13. isSpeechSynthesisSupported 测试
+// ============================================================================
+
+describe('isSpeechSynthesisSupported', () => {
+  it('should return false in Node.js environment', () => {
+    // In Node.js test environment, window.speechSynthesis is not available
+    expect(isSpeechSynthesisSupported()).toBe(false);
+  });
+});
+
+// ============================================================================
+// 14. Type Exports 测试
+// ============================================================================
+
+describe('Synthesis Type Exports', () => {
+  it('should export ISynthesisResult interface', () => {
+    const result: ISynthesisResult = {
+      audioData: new ArrayBuffer(0),
+      format: 'mp3',
+    };
+    expect(result.format).toBe('mp3');
+  });
+
+  it('should export IAdvancedSynthesisConfig interface', () => {
+    const config: IAdvancedSynthesisConfig = {
+      mode: 'auto',
+      audioFormat: 'mp3',
+      enableSSML: true,
+      preload: false,
+    };
+    expect(config.mode).toBe('auto');
+  });
+});
+
+// ============================================================================
+// 15. Synthesis Edge Cases 边界情况测试
+// ============================================================================
+
+describe('Synthesis Edge Cases', () => {
+  describe('SynthesisAudioUtils edge cases', () => {
+    it('should handle binary data conversion', () => {
+      const bytes = new Uint8Array([0, 1, 255, 128]);
+      const base64 = SynthesisAudioUtils.arrayBufferToBase64(bytes.buffer);
+      expect(base64).toBeTruthy();
+      expect(typeof base64).toBe('string');
+
+      const decoded = SynthesisAudioUtils.base64ToArrayBuffer(base64);
+      const decodedBytes = new Uint8Array(decoded);
+      expect(Array.from(decodedBytes)).toEqual([0, 1, 255, 128]);
+    });
+
+    it('should handle large buffer', () => {
+      const size = 10000;
+      const bytes = new Uint8Array(size);
+      for (let i = 0; i < size; i++) {
+        bytes[i] = i % 256;
+      }
+
+      const base64 = SynthesisAudioUtils.arrayBufferToBase64(bytes.buffer);
+      const decoded = SynthesisAudioUtils.base64ToArrayBuffer(base64);
+
+      expect(decoded.byteLength).toBe(size);
+    });
+  });
+
+  describe('Adapter voice list edge cases', () => {
+    it('all adapters should return non-empty voice arrays', async () => {
+      const adapters = [
+        new AWSSynthesisAdapter('', '', ''),
+        new XunfeiSynthesisAdapter(''),
+        new TencentSynthesisAdapter('', ''),
+        new BaiduSynthesisAdapter(''),
+        new AlibabaSynthesisAdapter('', '', ''),
+      ];
+
+      for (const adapter of adapters) {
+        const voices = await adapter.getVoices();
+        expect(voices.length).toBeGreaterThan(0);
+        expect(voices[0]?.id).toBeTruthy();
+        expect(voices[0]?.name).toBeTruthy();
+        expect(voices[0]?.lang).toBeTruthy();
+      }
+    });
+  });
+});
+
+// ============================================================================
+// 16. Synthesis Integration Tests 集成测试
+// ============================================================================
+
+describe('Synthesis Integration Scenarios', () => {
+  it('should create synthesizer and check initial state', () => {
+    const synthesizer = new SpeechSynthesizerImpl();
+
+    expect(synthesizer.status).toBe('idle');
+    expect(synthesizer.currentProvider).toBe('browser');
+    expect(synthesizer.synthesisStatus).toBe(SynthesisStatus.IDLE);
+    expect(synthesizer.isSpeaking()).toBe(false);
+    expect(synthesizer.isPaused()).toBe(false);
+
+    synthesizer.dispose();
+  });
+
+  it('should handle multiple event registrations and removals', () => {
+    const synthesizer = new SpeechSynthesizerImpl();
+    const handlers = [vi.fn(), vi.fn(), vi.fn()];
+
+    // Register all handlers
+    handlers.forEach(h => synthesizer.on('start', h));
+
+    // Remove middle handler
+    synthesizer.off('start', handlers[1]!);
+
+    // Trigger event
+    const eventMap = (synthesizer as unknown as { eventHandlers: Map<string, Set<Function>> })
+      .eventHandlers;
+    eventMap.get('start')?.forEach(h => h({ type: 'start' }));
+
+    expect(handlers[0]).toHaveBeenCalledOnce();
+    expect(handlers[1]).not.toHaveBeenCalled();
+    expect(handlers[2]).toHaveBeenCalledOnce();
+
+    synthesizer.dispose();
+  });
+
+  it('should correctly round-trip audio data through base64', () => {
+    // Create original audio data
+    const samples = new Int16Array([100, -200, 300, -400, 500]);
+    const originalBuffer = samples.buffer.slice(0);
+
+    // Convert to base64 and back
+    const base64 = SynthesisAudioUtils.arrayBufferToBase64(originalBuffer);
+    const decoded = SynthesisAudioUtils.base64ToArrayBuffer(base64);
+
+    // Verify
+    const decodedSamples = new Int16Array(decoded);
+    expect(Array.from(decodedSamples)).toEqual(Array.from(samples));
+  });
+});

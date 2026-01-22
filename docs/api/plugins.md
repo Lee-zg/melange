@@ -4,14 +4,16 @@
 
 ### createSpeechSynthesizer
 
-创建语音合成器实例。
+创建语音合成器实例。支持原生合成和云端合成两种模式。
 
 ```typescript
-function createSpeechSynthesizer(config?: SynthesisConfig): Promise<SpeechSynthesizer>;
+function createSpeechSynthesizer(
+  config?: SynthesisConfig | IAdvancedSynthesisConfig
+): Promise<SpeechSynthesizer>;
 ```
 
 **参数：**
-- `config` - 可选配置对象
+- `config` - 可选配置对象，支持基础配置或高级配置
 
 **返回：** 语音合成器实例
 
@@ -22,11 +24,33 @@ function createSpeechSynthesizer(config?: SynthesisConfig): Promise<SpeechSynthe
 快速朗读文本。
 
 ```typescript
-function speak(text: string, config?: SynthesisConfig): Promise<void>;
+function speak(
+  text: string, 
+  config?: SynthesisConfig | IAdvancedSynthesisConfig
+): Promise<void>;
 ```
 
 **参数：**
 - `text` - 要朗读的文本
+- `config` - 可选配置
+
+---
+
+### speakWithCloud
+
+使用云端服务快速朗读文本。
+
+```typescript
+function speakWithCloud(
+  text: string,
+  adapter: ICloudSynthesisAdapter,
+  config?: SynthesisConfig
+): Promise<void>;
+```
+
+**参数：**
+- `text` - 要朗读的文本
+- `adapter` - 云端合成适配器
 - `config` - 可选配置
 
 ---
@@ -49,6 +73,7 @@ function isSpeechSynthesisSupported(): boolean;
 interface SpeechSynthesizer {
   readonly currentProvider: SpeechProviderType;
   readonly status: SpeechServiceStatus;
+  readonly synthesisStatus: SynthesisStatus;  // 新增
   
   initialize(config?: SynthesisConfig): Promise<void>;
   getVoices(): Promise<VoiceInfo[]>;
@@ -61,6 +86,23 @@ interface SpeechSynthesizer {
   on(event: SynthesisEventType, handler: SynthesisEventHandler): void;
   off(event: SynthesisEventType, handler: SynthesisEventHandler): void;
   dispose(): void;
+  registerProvider(type: SpeechProviderType, provider: SynthesisProvider): void;
+  useCloudAdapter(adapter: ICloudSynthesisAdapter): void;  // 新增
+}
+```
+
+---
+
+### SynthesisStatus
+
+合成器状态枚举。
+
+```typescript
+enum SynthesisStatus {
+  IDLE = 'IDLE',           // 空闲状态
+  LOADING = 'LOADING',     // 加载中
+  SPEAKING = 'SPEAKING',   // 正在播放
+  PAUSED = 'PAUSED',       // 已暂停
 }
 ```
 
@@ -68,7 +110,7 @@ interface SpeechSynthesizer {
 
 ### SynthesisConfig
 
-语音合成配置。
+基础语音合成配置。
 
 ```typescript
 interface SynthesisConfig {
@@ -81,6 +123,47 @@ interface SynthesisConfig {
   autoFallback?: boolean;
   fallbackProviders?: SpeechProviderType[];
 }
+```
+
+---
+
+### IAdvancedSynthesisConfig
+
+高级语音合成配置（支持云端合成）。
+
+```typescript
+interface IAdvancedSynthesisConfig extends SynthesisConfig {
+  mode?: SynthesisEngineMode;              // 合成引擎模式
+  cloudAdapter?: ICloudSynthesisAdapter;   // 云端适配器
+  audioFormat?: CloudAudioFormat;          // 音频格式偏好
+  enableSSML?: boolean;                    // 是否启用 SSML
+  preload?: boolean;                       // 是否预加载音频
+  cacheSize?: number;                      // 音频缓存大小
+}
+```
+
+---
+
+### SynthesisEngineMode
+
+合成引擎模式。
+
+```typescript
+type SynthesisEngineMode = 'native' | 'cloud' | 'auto';
+```
+
+- `native` - 仅使用浏览器原生 API
+- `cloud` - 仅使用云端合成
+- `auto` - 自动选择（默认）
+
+---
+
+### CloudAudioFormat
+
+云端 TTS 音频格式。
+
+```typescript
+type CloudAudioFormat = 'mp3' | 'wav' | 'ogg' | 'pcm';
 ```
 
 ---
@@ -115,6 +198,160 @@ type SynthesisEventType =
   | 'boundary'   // 词边界
   | 'mark'       // 标记
   | 'error';     // 错误
+```
+
+---
+
+## 云端合成适配器
+
+### ICloudSynthesisAdapter
+
+云端合成适配器接口。
+
+```typescript
+interface ICloudSynthesisAdapter {
+  readonly name: string;
+  synthesize(text: string, config?: IAdvancedSynthesisConfig): Promise<ISynthesisResult>;
+  getVoices?(): Promise<ICloudVoice[]>;
+  isAvailable?(): boolean;
+}
+```
+
+---
+
+### 内置适配器
+
+#### GenericSynthesisAdapter
+
+通用 BFF 适配器，用于自建后端代理。
+
+```typescript
+class GenericSynthesisAdapter implements ICloudSynthesisAdapter {
+  constructor(baseUrl: string);
+}
+```
+
+#### AzureSynthesisAdapter
+
+Azure 语音服务适配器。
+
+```typescript
+class AzureSynthesisAdapter implements ICloudSynthesisAdapter {
+  constructor(
+    subscriptionKey: string,
+    region: string,
+    defaultVoice?: string  // 默认 'zh-CN-XiaoxiaoNeural'
+  );
+}
+```
+
+#### GoogleSynthesisAdapter
+
+Google Cloud TTS 适配器。
+
+```typescript
+class GoogleSynthesisAdapter implements ICloudSynthesisAdapter {
+  constructor(
+    apiKey: string,
+    defaultVoice?: string  // 默认 'zh-CN-Wavenet-A'
+  );
+}
+```
+
+#### AWSSynthesisAdapter
+
+AWS Polly 适配器。
+
+```typescript
+class AWSSynthesisAdapter implements ICloudSynthesisAdapter {
+  constructor(
+    accessKeyId: string,
+    secretAccessKey: string,
+    region: string,
+    defaultVoice?: string  // 默认 'Zhiyu'
+  );
+}
+```
+
+#### XunfeiSynthesisAdapter
+
+讯飞云适配器。
+
+```typescript
+class XunfeiSynthesisAdapter implements ICloudSynthesisAdapter {
+  constructor(
+    appId: string,
+    apiKey?: string,       // 可选，生产环境建议后端签名
+    apiSecret?: string,    // 可选
+    defaultVoice?: string  // 默认 'xiaoyan'
+  );
+}
+```
+
+#### TencentSynthesisAdapter
+
+腾讯云适配器。
+
+```typescript
+class TencentSynthesisAdapter implements ICloudSynthesisAdapter {
+  constructor(
+    secretId: string,
+    secretKey: string,
+    defaultVoice?: string  // 默认 '101001'
+  );
+}
+```
+
+#### BaiduSynthesisAdapter
+
+百度云适配器。
+
+```typescript
+class BaiduSynthesisAdapter implements ICloudSynthesisAdapter {
+  constructor(
+    accessToken: string,
+    defaultVoice?: string  // 默认 '0' (度小美)
+  );
+}
+```
+
+#### AlibabaSynthesisAdapter
+
+阿里云适配器。
+
+```typescript
+class AlibabaSynthesisAdapter implements ICloudSynthesisAdapter {
+  constructor(
+    accessKeyId: string,
+    accessKeySecret: string,
+    appKey: string,
+    defaultVoice?: string  // 默认 'xiaoyun'
+  );
+}
+```
+
+---
+
+## 合成音频工具
+
+### SynthesisAudioUtils
+
+音频处理工具集。
+
+```typescript
+const SynthesisAudioUtils = {
+  // 创建 AudioContext
+  createAudioContext(): AudioContext;
+  
+  // ArrayBuffer 转 Base64
+  arrayBufferToBase64(buffer: ArrayBuffer): string;
+  
+  // Base64 转 ArrayBuffer
+  base64ToArrayBuffer(base64: string): ArrayBuffer;
+  
+  // 估算音频时长
+  estimateDuration(byteLength: number, format: CloudAudioFormat): number;
+};
 ```
 
 ---
