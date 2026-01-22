@@ -56,6 +56,7 @@ export function debounce<T extends AnyFunction>(
 
   function debounced(this: unknown, ...args: Parameters<T>): ReturnType<T> {
     lastArgs = args;
+    // eslint-disable-next-line @typescript-eslint/no-this-alias
     lastThis = this;
 
     if (leading && timeoutId === null) {
@@ -132,6 +133,7 @@ export function throttle<T extends AnyFunction>(fn: T, limit: number): T & { can
     const remaining = limit - (now - lastCall);
 
     lastArgs = args;
+    // eslint-disable-next-line @typescript-eslint/no-this-alias
     lastThis = this;
 
     if (remaining <= 0) {
@@ -341,6 +343,7 @@ export async function parallel<T>(
   options?: { concurrency?: number }
 ): Promise<T[]> {
   const { concurrency = Infinity } = options ?? {};
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
   const results: T[] = new Array(tasks.length);
   let currentIndex = 0;
 

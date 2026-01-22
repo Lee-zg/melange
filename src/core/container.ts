@@ -271,6 +271,7 @@ export const globalContainer = new Container();
  * @returns 类装饰器
  */
 export function Injectable(): ClassDecorator {
+  // eslint-disable-next-line @typescript-eslint/ban-types
   return function <TFunction extends Function>(target: TFunction): TFunction {
     // 如果可用则使用 reflect-metadata
     const reflect = Reflect as unknown as {
@@ -327,6 +328,7 @@ export function Inject(token: Token): ParameterDecorator {
  * @returns 类装饰器
  */
 export function Singleton(): ClassDecorator {
+  // eslint-disable-next-line @typescript-eslint/ban-types
   return function <TFunction extends Function>(target: TFunction): TFunction {
     // 如果可用则使用 reflect-metadata
     const reflect = Reflect as unknown as {

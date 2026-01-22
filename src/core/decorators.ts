@@ -197,6 +197,7 @@ export function Log(
                 // eslint-disable-next-line no-console
                 console.log(`${logPrefix}Exiting ${methodName}`);
               }
+              // eslint-disable-next-line @typescript-eslint/no-unsafe-return
               return asyncResult;
             })
             .catch(error => {
@@ -317,6 +318,7 @@ export function Deprecated(message?: string): MethodDecorator {
  * @returns 类装饰器
  */
 export function Sealed(): ClassDecorator {
+  // eslint-disable-next-line @typescript-eslint/ban-types
   return function <TFunction extends Function>(target: TFunction): TFunction {
     Object.seal(target);
     Object.seal(target.prototype);
@@ -341,6 +343,7 @@ export function Sealed(): ClassDecorator {
  * @returns 类装饰器
  */
 export function Frozen(): ClassDecorator {
+  // eslint-disable-next-line @typescript-eslint/ban-types
   return function <TFunction extends Function>(target: TFunction): TFunction {
     Object.freeze(target);
     Object.freeze(target.prototype);
