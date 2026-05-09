@@ -481,8 +481,19 @@ interface BrowserSpeechRecognitionConstructor {
 // ============================================================================
 
 /**
- * 通用适配器 (BFF 模式 - 推荐)
- * 适用于自建后端代理场景
+ * 通用语音识别适配器。
+ *
+ * @description
+ * 这是生产推荐的 BFF 模式适配器。浏览器只上传用户授权后的短音频或连接
+ * 自有 WebSocket 网关，云厂商密钥、签名、大小限制、超时、审计和错误码
+ * 必须由后端完成。
+ *
+ * @remarks
+ * 默认协议：
+ * - `GET/WS {baseUrl}` 用于流式识别；
+ * - `POST {baseUrl}/recognize` 使用 `multipart/form-data` 字段 `file` 上传 WAV；
+ * - JSON 结果支持 `{ text, score }` 或 `{ transcript, confidence }`；
+ * - 错误响应建议映射为 `{ code, message, retryable, requestId? }`。
  */
 export class GenericAdapter implements ICloudRecognitionAdapter {
   readonly name = 'Generic/BFF';
@@ -523,8 +534,10 @@ export class GenericAdapter implements ICloudRecognitionAdapter {
 }
 
 /**
- * 讯飞云适配器
- * 支持讯飞语音听写 WebAPI
+ * 讯飞云示例适配器。
+ *
+ * @deprecated demo-only。该适配器只展示讯飞听写协议结构。生产环境应由 BFF
+ * 生成鉴权 URL 和请求签名，前端不得保存 apiKey/apiSecret。
  */
 export class XunfeiAdapter implements ICloudRecognitionAdapter {
   readonly name = 'Xunfei';
@@ -621,8 +634,10 @@ export class XunfeiAdapter implements ICloudRecognitionAdapter {
 }
 
 /**
- * 腾讯云适配器
- * 支持腾讯云一句话识别
+ * 腾讯云示例适配器。
+ *
+ * @deprecated demo-only。生产环境必须在 BFF 完成 TC3-HMAC-SHA256 签名，
+ * 不应在浏览器保存 secretId/secretKey。
  */
 export class TencentAdapter implements ICloudRecognitionAdapter {
   readonly name = 'Tencent';
@@ -686,8 +701,10 @@ export class TencentAdapter implements ICloudRecognitionAdapter {
 }
 
 /**
- * 百度云适配器
- * 支持百度语音识别 REST API 和 WebSocket API
+ * 百度云示例适配器。
+ *
+ * @deprecated experimental。access token、appId 和 appKey 不应由浏览器长期持有。
+ * 生产环境请通过 BFF 管理 token、音频大小限制、超时和错误映射。
  */
 export class BaiduAdapter implements ICloudRecognitionAdapter {
   readonly name = 'Baidu';
@@ -786,8 +803,10 @@ export class BaiduAdapter implements ICloudRecognitionAdapter {
 }
 
 /**
- * 阿里云适配器
- * 支持阿里云智能语音交互
+ * 阿里云示例适配器。
+ *
+ * @deprecated demo-only。构造函数保留 accessKeySecret 以兼容旧 API，
+ * 生产环境应通过 BFF 获取临时凭证或由后端直接调用阿里云服务。
  */
 export class AlibabaAdapter implements ICloudRecognitionAdapter {
   readonly name = 'Alibaba';
@@ -893,7 +912,10 @@ export class AlibabaAdapter implements ICloudRecognitionAdapter {
 }
 
 /**
- * Google Cloud Speech 适配器
+ * Google Cloud Speech 直连适配器。
+ *
+ * @deprecated demo-only。该适配器会将 API key 放入浏览器请求 URL，
+ * 生产环境请通过 BFF 代理调用 Google Cloud Speech。
  */
 export class GoogleAdapter implements ICloudRecognitionAdapter {
   readonly name = 'Google';
@@ -960,7 +982,10 @@ export class GoogleAdapter implements ICloudRecognitionAdapter {
 }
 
 /**
- * Azure Speech 适配器
+ * Azure Speech 直连适配器。
+ *
+ * @deprecated demo-only。该适配器会在浏览器请求中使用 subscription key，
+ * 生产环境请通过 BFF 代理调用 Azure Speech。
  */
 export class AzureAdapter implements ICloudRecognitionAdapter {
   readonly name = 'Azure';

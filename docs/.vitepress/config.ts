@@ -80,6 +80,7 @@ export default defineConfig({
             { text: '依赖注入', link: '/guide/dependency-injection' },
             { text: '装饰器', link: '/guide/decorators' },
             { text: '语音功能', link: '/guide/speech' },
+            { text: '指纹识别', link: '/guide/fingerprint' },
           ],
         },
       ],

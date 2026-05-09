@@ -20,6 +20,11 @@ import {
   type IAdvancedRecognitionConfig,
 } from '../src/plugins/speech/recognition';
 
+afterEach(() => {
+  vi.unstubAllGlobals();
+  vi.restoreAllMocks();
+});
+
 // ============================================================================
 // 1. AudioUtils 音频工具测试
 // ============================================================================
@@ -283,6 +288,42 @@ describe('Cloud Adapters', () => {
       const data = { text: 'Test' };
       const result = adapter.parseResult(data);
       expect(result?.confidence).toBe(0.9);
+    });
+
+    it('should upload short audio to BFF without cloud provider secrets', async () => {
+      const fetchMock = vi.fn().mockResolvedValue({
+        ok: true,
+        json: vi.fn().mockResolvedValue({ text: 'hello', score: 0.88 }),
+      });
+      vi.stubGlobal('fetch', fetchMock);
+
+      const result = await adapter.recognizeShortAudio(new ArrayBuffer(8));
+
+      expect(result.transcript).toBe('hello');
+      expect(fetchMock).toHaveBeenCalledWith(
+        'https://api.example.com/recognize',
+        expect.objectContaining({
+          method: 'POST',
+          body: expect.any(FormData),
+        })
+      );
+      const request = fetchMock.mock.calls[0]?.[1] as { body: FormData };
+      expect(Array.from(request.body.keys())).toEqual(['file']);
+    });
+
+    it('should throw on BFF non-2xx response', async () => {
+      vi.stubGlobal(
+        'fetch',
+        vi.fn().mockResolvedValue({
+          ok: false,
+          status: 429,
+          statusText: 'Too Many Requests',
+        })
+      );
+
+      await expect(adapter.recognizeShortAudio(new ArrayBuffer(8))).rejects.toThrow(
+        'HTTP 429: Too Many Requests'
+      );
     });
   });
 
@@ -1015,6 +1056,63 @@ describe('Cloud Synthesis Adapters', () => {
 
     it('should have correct name', () => {
       expect(adapter.name).toBe('Generic/BFF');
+    });
+
+    it('should send only synthesis payload to BFF', async () => {
+      const audio = new Uint8Array([1, 2, 3]).buffer;
+      const fetchMock = vi.fn().mockResolvedValue({
+        ok: true,
+        arrayBuffer: vi.fn().mockResolvedValue(audio),
+      });
+      vi.stubGlobal('fetch', fetchMock);
+
+      await adapter.synthesize('hello', {
+        lang: 'en-US',
+        voice: 'demo',
+        rate: 1.1,
+        pitch: 0.9,
+        volume: 0.8,
+        audioFormat: 'mp3',
+      });
+
+      const request = fetchMock.mock.calls[0]?.[1] as { body: string };
+      const payload = JSON.parse(request.body) as Record<string, unknown>;
+      expect(fetchMock).toHaveBeenCalledWith(
+        'https://api.example.com/synthesize',
+        expect.objectContaining({ method: 'POST' })
+      );
+      expect(payload).toEqual({
+        text: 'hello',
+        lang: 'en-US',
+        voice: 'demo',
+        rate: 1.1,
+        pitch: 0.9,
+        volume: 0.8,
+        format: 'mp3',
+      });
+      expect(payload).not.toHaveProperty('apiKey');
+      expect(payload).not.toHaveProperty('secretKey');
+      expect(payload).not.toHaveProperty('accessKeySecret');
+      expect(payload).not.toHaveProperty('subscriptionKey');
+    });
+
+    it('should throw on BFF synthesis non-2xx response', async () => {
+      vi.stubGlobal(
+        'fetch',
+        vi.fn().mockResolvedValue({
+          ok: false,
+          status: 503,
+          statusText: 'Service Unavailable',
+        })
+      );
+
+      await expect(adapter.synthesize('hello')).rejects.toThrow('HTTP 503: Service Unavailable');
+    });
+
+    it('should return empty voices on BFF voice list failure', async () => {
+      vi.stubGlobal('fetch', vi.fn().mockRejectedValue(new Error('network')));
+
+      await expect(adapter.getVoices()).resolves.toEqual([]);
     });
   });
 

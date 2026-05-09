@@ -1,5 +1,92 @@
 # 插件 API
 
+## 指纹识别
+
+### getFingerprint
+
+快速生成一次浏览器/设备指纹。默认只采集低敏信号，并对部分字段做归一化或分桶处理。
+
+```typescript
+function getFingerprint(options?: FingerprintOptions): Promise<FingerprintResult>;
+```
+
+**参数：**
+- `options` - 可选指纹生成配置
+
+**返回：** 指纹结果，包含 `visitorId`、`components`、`confidence`、`duration`
+
+**隐私说明：** 默认不采集 Canvas、音频、WebGL 渲染、字体枚举、浏览历史或插件列表。
+
+---
+
+### createFingerprintGenerator
+
+创建可复用的指纹生成器实例，支持缓存与默认配置。
+
+```typescript
+function createFingerprintGenerator(options?: FingerprintOptions): FingerprintGenerator;
+```
+
+---
+
+### registerFingerprintPlugin
+
+将指纹生成器注册到 Melange 依赖注入容器。
+
+```typescript
+function registerFingerprintPlugin(
+  container?: Container,
+  options?: FingerprintOptions
+): Container;
+```
+
+---
+
+### isFingerprintSupported
+
+检查当前环境是否具备基础指纹采集能力。
+
+```typescript
+function isFingerprintSupported(): boolean;
+```
+
+---
+
+### FingerprintOptions
+
+```typescript
+interface FingerprintOptions {
+  salt?: string;
+  cache?: boolean;
+  cacheTtl?: number;
+  componentTimeout?: number;
+  privacyMode?: 'strict' | 'balanced' | 'debug';
+  hashAlgorithm?: 'fnv1a64' | 'sha256';
+  screenBucketSize?: number;
+  normalizeUserAgent?: boolean;
+  include?: readonly string[];
+  exclude?: readonly string[];
+  collectors?: readonly FingerprintCollector[];
+}
+```
+
+---
+
+### FingerprintResult
+
+```typescript
+interface FingerprintResult {
+  readonly visitorId: string;
+  readonly components: FingerprintComponentMap;
+  readonly confidence: FingerprintConfidence;
+  readonly version: string;
+  readonly duration: number;
+  readonly generatedAt: number;
+}
+```
+
+---
+
 ## 语音合成 (TTS)
 
 ### createSpeechSynthesizer
@@ -16,6 +103,8 @@ function createSpeechSynthesizer(
 - `config` - 可选配置对象，支持基础配置或高级配置
 
 **返回：** 语音合成器实例
+
+**生产建议：** 云端合成推荐通过 BFF 代理接入；不要在浏览器中暴露云厂商长期密钥。
 
 ---
 
@@ -52,6 +141,8 @@ function speakWithCloud(
 - `text` - 要朗读的文本
 - `adapter` - 云端合成适配器
 - `config` - 可选配置
+
+**安全说明：** 该 API 适合快速集成。生产环境建议传入 BFF 适配器，由后端完成云服务鉴权、签名和限流。
 
 ---
 
@@ -231,9 +322,18 @@ class GenericSynthesisAdapter implements ICloudSynthesisAdapter {
 }
 ```
 
+**状态：** stable，生产推荐。
+
+**BFF 协议：**
+- `POST {baseUrl}/synthesize`：请求 JSON 包含 `text`、`lang`、`voice`、`rate`、`pitch`、`volume`、`format`，成功返回音频二进制。
+- `GET {baseUrl}/voices`：成功返回 `{ voices: ICloudVoice[] }`。
+- 失败响应建议为 `{ code: string, message: string, retryable: boolean, requestId?: string }`。
+
 #### AzureSynthesisAdapter
 
 Azure 语音服务适配器。
+
+**状态：** demo-only。生产环境请通过 BFF 代理，不要在浏览器暴露 `subscriptionKey`。
 
 ```typescript
 class AzureSynthesisAdapter implements ICloudSynthesisAdapter {
@@ -249,6 +349,8 @@ class AzureSynthesisAdapter implements ICloudSynthesisAdapter {
 
 Google Cloud TTS 适配器。
 
+**状态：** demo-only。生产环境请通过 BFF 代理，不要在浏览器 URL 或 bundle 中暴露 `apiKey`。
+
 ```typescript
 class GoogleSynthesisAdapter implements ICloudSynthesisAdapter {
   constructor(
@@ -261,6 +363,8 @@ class GoogleSynthesisAdapter implements ICloudSynthesisAdapter {
 #### AWSSynthesisAdapter
 
 AWS Polly 适配器。
+
+**状态：** demo-only。生产环境请在 BFF 完成 AWS 签名，不要在前端保存 `secretAccessKey`。
 
 ```typescript
 class AWSSynthesisAdapter implements ICloudSynthesisAdapter {
@@ -277,6 +381,8 @@ class AWSSynthesisAdapter implements ICloudSynthesisAdapter {
 
 讯飞云适配器。
 
+**状态：** demo-only。生产环境请在 BFF 完成讯飞鉴权签名。
+
 ```typescript
 class XunfeiSynthesisAdapter implements ICloudSynthesisAdapter {
   constructor(
@@ -292,6 +398,8 @@ class XunfeiSynthesisAdapter implements ICloudSynthesisAdapter {
 
 腾讯云适配器。
 
+**状态：** demo-only。生产环境请在 BFF 完成 TC3-HMAC-SHA256 签名。
+
 ```typescript
 class TencentSynthesisAdapter implements ICloudSynthesisAdapter {
   constructor(
@@ -306,6 +414,8 @@ class TencentSynthesisAdapter implements ICloudSynthesisAdapter {
 
 百度云适配器。
 
+**状态：** experimental。生产环境请由 BFF 管理 access token 生命周期。
+
 ```typescript
 class BaiduSynthesisAdapter implements ICloudSynthesisAdapter {
   constructor(
@@ -318,6 +428,8 @@ class BaiduSynthesisAdapter implements ICloudSynthesisAdapter {
 #### AlibabaSynthesisAdapter
 
 阿里云适配器。
+
+**状态：** demo-only。生产环境请通过 BFF 管理凭证或后端直连阿里云。
 
 ```typescript
 class AlibabaSynthesisAdapter implements ICloudSynthesisAdapter {
@@ -372,6 +484,8 @@ function createSpeechRecognizer(
 - `config` - 可选配置对象，支持基础配置或高级配置
 
 **返回：** 语音识别器实例
+
+**生产建议：** 云端识别涉及麦克风音频，推荐通过 BFF 代理上传和转发，避免前端持有长期云密钥。
 
 ---
 
@@ -604,9 +718,18 @@ class GenericAdapter implements ICloudRecognitionAdapter {
 }
 ```
 
+**状态：** stable，生产推荐。
+
+**BFF 协议：**
+- `POST {baseUrl}/recognize`：使用 `multipart/form-data` 字段 `file` 上传 WAV 音频，成功返回 `{ text, score }` 或 `{ transcript, confidence }`。
+- `WebSocket {baseUrl}`：用于流式识别，服务端返回 `{ transcript, confidence, isFinal }` 分片。
+- 失败响应建议为 `{ code: string, message: string, retryable: boolean, requestId?: string }`。
+
 #### XunfeiAdapter
 
 讯飞云适配器。
+
+**状态：** demo-only。生产环境请由 BFF 生成鉴权 URL 和请求签名。
 
 ```typescript
 class XunfeiAdapter implements ICloudRecognitionAdapter {
@@ -622,6 +745,8 @@ class XunfeiAdapter implements ICloudRecognitionAdapter {
 
 腾讯云适配器。
 
+**状态：** demo-only。生产环境请在 BFF 完成 TC3-HMAC-SHA256 签名。
+
 ```typescript
 class TencentAdapter implements ICloudRecognitionAdapter {
   constructor(
@@ -634,6 +759,8 @@ class TencentAdapter implements ICloudRecognitionAdapter {
 #### BaiduAdapter
 
 百度云适配器。
+
+**状态：** experimental。生产环境请由 BFF 管理 token、音频大小限制和错误映射。
 
 ```typescript
 class BaiduAdapter implements ICloudRecognitionAdapter {
@@ -650,6 +777,8 @@ class BaiduAdapter implements ICloudRecognitionAdapter {
 
 阿里云适配器。
 
+**状态：** demo-only。生产环境请通过 BFF 管理凭证或后端直连阿里云。
+
 ```typescript
 class AlibabaAdapter implements ICloudRecognitionAdapter {
   constructor(
@@ -664,6 +793,8 @@ class AlibabaAdapter implements ICloudRecognitionAdapter {
 
 Google Cloud Speech 适配器。
 
+**状态：** demo-only。生产环境请通过 BFF 代理，不要在浏览器 URL 或 bundle 中暴露 `apiKey`。
+
 ```typescript
 class GoogleAdapter implements ICloudRecognitionAdapter {
   constructor(
@@ -676,6 +807,8 @@ class GoogleAdapter implements ICloudRecognitionAdapter {
 #### AzureAdapter
 
 Azure Speech 适配器。
+
+**状态：** demo-only。生产环境请通过 BFF 代理，不要在浏览器暴露 `subscriptionKey`。
 
 ```typescript
 class AzureAdapter implements ICloudRecognitionAdapter {

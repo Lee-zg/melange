@@ -17,9 +17,15 @@ export default defineConfig({
     // 覆盖率配置
     coverage: {
       provider: 'v8',
-      reporter: ['text', 'json', 'html'],
+      reporter: ['text', 'json', 'json-summary', 'html'],
       include: ['src/**/*.ts'],
-      exclude: ['src/**/*.test.ts', 'src/**/*.spec.ts', 'src/**/index.ts'],
+      exclude: ['src/**/*.test.ts', 'src/**/*.spec.ts', 'src/**/index.ts', 'src/**/types.ts'],
+      thresholds: {
+        statements: 60,
+        branches: 70,
+        functions: 50,
+        lines: 60,
+      },
     },
 
     // 类型检查

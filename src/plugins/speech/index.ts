@@ -80,10 +80,28 @@ export type {
 // ============================================================================
 
 export {
+  type SynthesisEngineMode,
+  type CloudAudioFormat,
+  type ISynthesisResult,
+  type ISynthesisError,
+  type ICloudVoice,
+  type IAdvancedSynthesisConfig,
+  type ICloudSynthesisAdapter,
+  SynthesisStatus,
+  SynthesisAudioUtils,
+  GenericSynthesisAdapter,
+  AzureSynthesisAdapter,
+  GoogleSynthesisAdapter,
+  AWSSynthesisAdapter,
+  XunfeiSynthesisAdapter,
+  TencentSynthesisAdapter,
+  BaiduSynthesisAdapter,
+  AlibabaSynthesisAdapter,
   SpeechSynthesizerImpl,
   createSpeechSynthesizer,
   isSpeechSynthesisSupported,
   speak,
+  speakWithCloud,
 } from './synthesis';
 
 // ============================================================================
@@ -91,6 +109,13 @@ export {
 // ============================================================================
 
 export {
+  type RecognitionEngineMode,
+  type CloudTransportType,
+  type IRecognitionResult,
+  type IRecognitionError,
+  type IAudioConfig,
+  type IAdvancedRecognitionConfig,
+  type ICloudRecognitionAdapter,
   SpeechRecognizerImpl,
   createSpeechRecognizer,
   isSpeechRecognitionSupported,
