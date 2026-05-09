@@ -1,5 +1,90 @@
 # 插件 API
 
+## 指纹识别
+
+### getFingerprint
+
+快速生成一次浏览器/设备指纹。默认只采集低敏信号，并对部分字段做归一化或分桶处理。
+
+```typescript
+function getFingerprint(options?: FingerprintOptions): Promise<FingerprintResult>;
+```
+
+**参数：**
+- `options` - 可选指纹生成配置
+
+**返回：** 指纹结果，包含 `visitorId`、`components`、`confidence`、`duration`
+
+---
+
+### createFingerprintGenerator
+
+创建可复用的指纹生成器实例，支持缓存与默认配置。
+
+```typescript
+function createFingerprintGenerator(options?: FingerprintOptions): FingerprintGenerator;
+```
+
+---
+
+### registerFingerprintPlugin
+
+将指纹生成器注册到 Melange 依赖注入容器。
+
+```typescript
+function registerFingerprintPlugin(
+  container?: Container,
+  options?: FingerprintOptions
+): Container;
+```
+
+---
+
+### isFingerprintSupported
+
+检查当前环境是否具备基础指纹采集能力。
+
+```typescript
+function isFingerprintSupported(): boolean;
+```
+
+---
+
+### FingerprintOptions
+
+```typescript
+interface FingerprintOptions {
+  salt?: string;
+  cache?: boolean;
+  cacheTtl?: number;
+  componentTimeout?: number;
+  privacyMode?: 'strict' | 'balanced' | 'debug';
+  hashAlgorithm?: 'fnv1a64' | 'sha256';
+  screenBucketSize?: number;
+  normalizeUserAgent?: boolean;
+  include?: readonly string[];
+  exclude?: readonly string[];
+  collectors?: readonly FingerprintCollector[];
+}
+```
+
+---
+
+### FingerprintResult
+
+```typescript
+interface FingerprintResult {
+  readonly visitorId: string;
+  readonly components: FingerprintComponentMap;
+  readonly confidence: FingerprintConfidence;
+  readonly version: string;
+  readonly duration: number;
+  readonly generatedAt: number;
+}
+```
+
+---
+
 ## 语音合成 (TTS)
 
 ### createSpeechSynthesizer

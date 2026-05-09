@@ -273,6 +273,12 @@ export {
   createSpeechRecognizer,
   isSpeechRecognitionSupported,
   listen,
+  // 指纹识别
+  FingerprintGeneratorImpl,
+  createFingerprintGenerator,
+  getFingerprint,
+  registerFingerprintPlugin,
+  isFingerprintSupported,
 } from './plugins';
 
 // 语音模块类型导出
@@ -301,6 +307,19 @@ export type {
   AWSSpeechConfig,
   CustomProviderConfig,
   ProviderConfig,
+  FingerprintComponentKey,
+  FingerprintComponentSource,
+  FingerprintPrivacyMode,
+  FingerprintHashAlgorithm,
+  FingerprintValue,
+  FingerprintComponent,
+  FingerprintComponentMap,
+  FingerprintConfidence,
+  FingerprintResult,
+  FingerprintCollectorContext,
+  FingerprintCollector,
+  FingerprintOptions,
+  FingerprintGenerator,
 } from './plugins';
 
 // ============================================================================

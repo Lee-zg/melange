@@ -35,6 +35,9 @@ features:
   - icon: 🔊
     title: 语音功能插件
     details: 内置语音合成和语音识别功能，优先使用浏览器 API，支持自动降级到第三方服务
+  - icon: 🔐
+    title: 隐私友好指纹
+    details: 参考 FingerprintJS 的组件化模型，默认只采集低敏信号，支持分桶、归一化和 DI 接入
   - icon: 📦
     title: Tree-shakeable
     details: 零依赖、模块化设计，支持按需导入，最大程度减少打包体积

@@ -1,12 +1,12 @@
 /**
  * @fileoverview Plugins 模块入口
  * @module melange/plugins
- * @description 提供扩展插件功能，包括语音合成、语音识别等
+ * @description 提供扩展插件功能，包括语音合成、语音识别、指纹识别等
  *
  * @example
  * ```typescript
- * // 导入语音功能
- * import { speak, listen, createSpeechSynthesizer } from 'melange/plugins';
+ * // 导入插件功能
+ * import { speak, listen, getFingerprint } from 'melange/plugins';
  *
  * // 或者导入整个模块
  * import * as plugins from 'melange/plugins';
@@ -54,3 +54,40 @@ export {
   isSpeechRecognitionSupported,
   listen,
 } from './speech';
+
+// ============================================================================
+// 指纹识别模块重导出
+// ============================================================================
+
+export {
+  type FingerprintComponentKey,
+  type FingerprintComponentSource,
+  type FingerprintPrivacyMode,
+  type FingerprintHashAlgorithm,
+  type FingerprintValue,
+  type FingerprintComponent,
+  type FingerprintComponentMap,
+  type FingerprintConfidence,
+  type FingerprintResult,
+  type FingerprintCollectorContext,
+  type FingerprintCollector,
+  type FingerprintOptions,
+  type FingerprintGenerator,
+  defaultFingerprintCollectors,
+  stableStringify,
+  serializeComponents,
+  fnv1a64,
+  sha256,
+  hashString,
+  normalizeUserAgent,
+  bucketNumber,
+  bucketHardwareConcurrency,
+  bucketDeviceMemory,
+  FINGERPRINT_VERSION,
+  FINGERPRINT_GENERATOR,
+  FingerprintGeneratorImpl,
+  createFingerprintGenerator,
+  getFingerprint,
+  registerFingerprintPlugin,
+  isFingerprintSupported,
+} from './fingerprint';
