@@ -5,6 +5,7 @@ const source = readFileSync(new URL('../src/index.ts', import.meta.url), 'utf8')
 const docsConfig = readFileSync(new URL('../docs/.vitepress/config.ts', import.meta.url), 'utf8');
 const match = source.match(/export const VERSION = '([^']+)'/);
 const docsMatch = docsConfig.match(/text:\s*'(\d+\.\d+\.\d+)'/);
+const docsUsesPackageVersion = /text:\s*`v\$\{pkg\.version\}`/.test(docsConfig);
 
 if (!match) {
   throw new Error('VERSION export was not found in src/index.ts');
@@ -19,11 +20,11 @@ if (runtimeVersion !== packageVersion) {
   );
 }
 
-if (!docsMatch) {
+if (!docsMatch && !docsUsesPackageVersion) {
   throw new Error('Documentation navigation version was not found in docs/.vitepress/config.ts');
 }
 
-const docsVersion = docsMatch[1];
+const docsVersion = docsUsesPackageVersion ? packageVersion : docsMatch?.[1];
 
 if (docsVersion !== packageVersion) {
   throw new Error(
