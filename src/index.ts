@@ -365,7 +365,7 @@ export type {
  * 当前库版本
  * @constant
  */
-export const VERSION = '1.2.4';
+export const VERSION = '1.2.5';
 
 /**
  * 库名
