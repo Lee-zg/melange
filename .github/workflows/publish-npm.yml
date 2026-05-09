@@ -32,13 +32,13 @@ jobs:
       - name: Run full CI gate
         run: npm run ci
 
-  # 发布到 npmjs.com
+  # 发布到 npmjs.com (使用 OIDC Trusted Publishing)
   publish-npm:
     needs: verify
     runs-on: ubuntu-latest
     permissions:
       contents: read
-      id-token: write # 用于 npm provenance
+      id-token: write # 用于 npm OIDC trusted publishing 和 provenance
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -56,10 +56,8 @@ jobs:
       - name: Build
         run: npm run build
 
-      - name: Publish to npm
+      - name: Publish to npm with provenance
         run: npm publish --provenance --access public
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
   # 发布到 GitHub Packages
   publish-gpr:
