@@ -223,8 +223,18 @@ export const SynthesisAudioUtils = {
 // ============================================================================
 
 /**
- * 通用适配器 (BFF 模式 - 推荐)
- * 适用于自建后端代理场景
+ * 通用语音合成适配器。
+ *
+ * @description
+ * 这是生产推荐的 BFF 模式适配器。浏览器只向自有后端提交文本、语言、
+ * 语速、音色和输出格式，云厂商密钥、签名、限流、审计和错误映射必须由
+ * 后端完成。
+ *
+ * @remarks
+ * 默认协议：
+ * - `POST {baseUrl}/synthesize` 返回音频二进制；
+ * - `GET {baseUrl}/voices` 返回 `{ voices: ICloudVoice[] }`；
+ * - 错误响应建议映射为 `{ code, message, retryable, requestId? }`。
  */
 export class GenericSynthesisAdapter implements ICloudSynthesisAdapter {
   readonly name = 'Generic/BFF';
@@ -274,7 +284,11 @@ export class GenericSynthesisAdapter implements ICloudSynthesisAdapter {
 }
 
 /**
- * Azure 语音服务适配器
+ * Azure 语音服务直连适配器。
+ *
+ * @deprecated demo-only。该适配器会在浏览器请求中使用 subscription key，
+ * 仅适合本地验证 API 形态。生产环境请使用 `GenericSynthesisAdapter`
+ * 连接自有 BFF，由后端持有和使用 Azure 凭证。
  */
 export class AzureSynthesisAdapter implements ICloudSynthesisAdapter {
   readonly name = 'Azure';
@@ -359,7 +373,10 @@ export class AzureSynthesisAdapter implements ICloudSynthesisAdapter {
 }
 
 /**
- * Google Cloud TTS 适配器
+ * Google Cloud TTS 直连适配器。
+ *
+ * @deprecated demo-only。该适配器会将 API key 放入浏览器请求 URL，
+ * 仅适合本地验证。生产环境请通过 BFF 代理调用 Google Cloud TTS。
  */
 export class GoogleSynthesisAdapter implements ICloudSynthesisAdapter {
   readonly name = 'Google';
@@ -433,7 +450,10 @@ export class GoogleSynthesisAdapter implements ICloudSynthesisAdapter {
 }
 
 /**
- * AWS Polly 适配器
+ * AWS Polly 示例适配器。
+ *
+ * @deprecated demo-only。构造函数保留 AWS 长期凭证参数以兼容旧 API，
+ * 但生产环境不得在前端创建或保存这些凭证，应由 BFF 完成签名和调用。
  */
 export class AWSSynthesisAdapter implements ICloudSynthesisAdapter {
   readonly name = 'AWS';
@@ -482,7 +502,10 @@ export class AWSSynthesisAdapter implements ICloudSynthesisAdapter {
 }
 
 /**
- * 讯飞云适配器
+ * 讯飞云示例适配器。
+ *
+ * @deprecated demo-only。仅用于展示参数映射和 BFF 请求形态。生产环境应在
+ * 后端完成讯飞 WebAPI 鉴权签名，不应在浏览器保存 apiKey/apiSecret。
  */
 export class XunfeiSynthesisAdapter implements ICloudSynthesisAdapter {
   readonly name = 'Xunfei';
@@ -534,7 +557,10 @@ export class XunfeiSynthesisAdapter implements ICloudSynthesisAdapter {
 }
 
 /**
- * 腾讯云适配器
+ * 腾讯云示例适配器。
+ *
+ * @deprecated demo-only。构造函数保留 secretId/secretKey 以兼容旧 API，
+ * 但生产环境必须在 BFF 完成 TC3-HMAC-SHA256 签名。
  */
 export class TencentSynthesisAdapter implements ICloudSynthesisAdapter {
   readonly name = 'Tencent';
@@ -582,7 +608,10 @@ export class TencentSynthesisAdapter implements ICloudSynthesisAdapter {
 }
 
 /**
- * 百度云适配器
+ * 百度云示例适配器。
+ *
+ * @deprecated experimental。access token 不应由浏览器长期持有。生产环境请由
+ * BFF 管理 token 生命周期、限流和错误映射。
  */
 export class BaiduSynthesisAdapter implements ICloudSynthesisAdapter {
   readonly name = 'Baidu';
@@ -638,7 +667,10 @@ export class BaiduSynthesisAdapter implements ICloudSynthesisAdapter {
 }
 
 /**
- * 阿里云适配器
+ * 阿里云示例适配器。
+ *
+ * @deprecated demo-only。构造函数保留 accessKeySecret 以兼容旧 API，
+ * 生产环境请通过 BFF 获取临时凭证或由后端直接调用阿里云服务。
  */
 export class AlibabaSynthesisAdapter implements ICloudSynthesisAdapter {
   readonly name = 'Alibaba';

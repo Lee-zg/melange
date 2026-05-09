@@ -47,7 +47,7 @@ export default defineConfig({
         ],
       },
       {
-        text: '1.0.0',
+        text: '1.2.1',
         items: [
           { text: '更新日志', link: '/changelog' },
           { text: 'GitHub', link: 'https://github.com/Lee-zg/melange' },

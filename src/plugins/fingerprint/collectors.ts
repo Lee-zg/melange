@@ -249,14 +249,14 @@ export const defaultFingerprintCollectors: readonly FingerprintCollector[] = [
     key: 'platform',
     source: 'low-entropy',
     confidence: 0.55,
-    collect: () => getNavigator()?.platform ?? null,
+    collect: (): string | null => getNavigator()?.platform ?? null,
   },
   {
     // 首选语言可用于区分环境区域偏好，但不应单独识别用户。
     key: 'language',
     source: 'low-entropy',
     confidence: 0.5,
-    collect: () => getNavigator()?.language ?? 'unknown',
+    collect: (): string => getNavigator()?.language ?? 'unknown',
   },
   {
     // 语言列表在 strict 模式下会收敛为首选语言。
@@ -277,7 +277,7 @@ export const defaultFingerprintCollectors: readonly FingerprintCollector[] = [
     key: 'timezoneOffset',
     source: 'low-entropy',
     confidence: 0.55,
-    collect: () => new Date().getTimezoneOffset(),
+    collect: (): number => new Date().getTimezoneOffset(),
   },
   {
     // 屏幕尺寸默认分桶并忽略方向，减少精确设备特征。
@@ -291,14 +291,14 @@ export const defaultFingerprintCollectors: readonly FingerprintCollector[] = [
     key: 'colorDepth',
     source: 'low-entropy',
     confidence: 0.38,
-    collect: () => getScreen()?.colorDepth ?? null,
+    collect: (): number | null => getScreen()?.colorDepth ?? null,
   },
   {
     // 像素比可能受缩放影响，因此按 0.25 分桶并给较低权重。
     key: 'pixelRatio',
     source: 'low-entropy',
     confidence: 0.42,
-    collect: () => {
+    collect: (): number => {
       const currentWindow = getWindow();
       return currentWindow ? bucketNumber(currentWindow.devicePixelRatio || 1, 0.25) : 1;
     },
@@ -308,7 +308,7 @@ export const defaultFingerprintCollectors: readonly FingerprintCollector[] = [
     key: 'hardwareConcurrency',
     source: 'low-entropy',
     confidence: 0.5,
-    collect: context => {
+    collect: (context): number | null => {
       const value = getNavigator()?.hardwareConcurrency;
       if (!value) {
         return null;
@@ -321,7 +321,7 @@ export const defaultFingerprintCollectors: readonly FingerprintCollector[] = [
     key: 'deviceMemory',
     source: 'low-entropy',
     confidence: 0.44,
-    collect: context => {
+    collect: (context): number | null => {
       const value = getNavigator()?.deviceMemory;
       if (!value) {
         return null;
@@ -334,21 +334,21 @@ export const defaultFingerprintCollectors: readonly FingerprintCollector[] = [
     key: 'maxTouchPoints',
     source: 'low-entropy',
     confidence: 0.45,
-    collect: () => getNavigator()?.maxTouchPoints ?? 0,
+    collect: (): number => getNavigator()?.maxTouchPoints ?? 0,
   },
   {
     // 仅检测 Cookie 能力，不读写任何 Cookie。
     key: 'cookiesEnabled',
     source: 'capability',
     confidence: 0.32,
-    collect: () => getNavigator()?.cookieEnabled ?? false,
+    collect: (): boolean => getNavigator()?.cookieEnabled ?? false,
   },
   {
     // 仅检测存储 API 是否可访问，不写入测试数据。
     key: 'storage',
     source: 'capability',
     confidence: 0.28,
-    collect: () => ({
+    collect: (): { localStorage: boolean; sessionStorage: boolean } => ({
       localStorage: getStorageAvailability('localStorage'),
       sessionStorage: getStorageAvailability('sessionStorage'),
     }),
@@ -358,13 +358,13 @@ export const defaultFingerprintCollectors: readonly FingerprintCollector[] = [
     key: 'indexedDB',
     source: 'capability',
     confidence: 0.24,
-    collect: getIndexedDBAvailability,
+    collect: (): boolean => getIndexedDBAvailability(),
   },
   {
     // 记录浏览器隐私偏好，业务侧可用来决定是否进一步降级采集。
     key: 'doNotTrack',
     source: 'capability',
     confidence: 0.2,
-    collect: () => getNavigator()?.doNotTrack ?? null,
+    collect: (): string | null => getNavigator()?.doNotTrack ?? null,
   },
 ];

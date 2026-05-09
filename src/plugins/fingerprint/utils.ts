@@ -51,10 +51,13 @@ export function stableStringify(value: FingerprintValue): string {
   }
 
   if (Array.isArray(value)) {
-    return `[${value.map(item => stableStringify(item)).join(',')}]`;
+    return `[${value.map((item: FingerprintValue) => stableStringify(item)).join(',')}]`;
   }
 
-  const entries = Object.entries(value).sort(([left], [right]) => left.localeCompare(right));
+  const record = value as Record<string, FingerprintValue>;
+  const entries = Object.keys(record)
+    .sort()
+    .map(key => [key, record[key] ?? null] as const);
   return `{${entries
     .map(([key, entryValue]) => `${JSON.stringify(key)}:${stableStringify(entryValue)}`)
     .join(',')}}`;

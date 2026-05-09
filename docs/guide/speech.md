@@ -2,6 +2,10 @@
 
 Melange 提供了内置的语音合成（TTS）和语音识别（STT）功能，优先使用浏览器原生 API，支持自动降级到第三方服务。
 
+::: warning 生产安全边界
+商业项目应默认通过 BFF/后端代理接入云服务。直接在浏览器中传入 `apiKey`、`secretKey`、`accessKeySecret`、`subscriptionKey` 或长期 `accessToken` 的示例仅用于本地验证和 API 形态说明，不应作为生产部署方式。
+:::
+
 ## 语音合成 (TTS)
 
 ### 快速朗读
@@ -71,7 +75,11 @@ synthesizer.dispose();
 - **原生模式**：使用浏览器 Web Speech API (默认)
 - **云端模式**：支持 Azure、Google、AWS、讯飞、腾讯、百度、阿里云等第三方服务
 
+云端模式推荐路径是 `GenericSynthesisAdapter` + 自有 BFF。Azure、Google、AWS、讯飞、腾讯、百度、阿里云的直连适配器保留为示例/实验能力，生产环境应由后端完成签名、鉴权、限流、重试和审计。
+
 #### 使用 Azure 语音合成
+
+以下示例展示适配器 API 形态。生产环境请改用 BFF 代理，不要把 Azure subscription key 暴露给浏览器。
 
 ```typescript
 import { createSpeechSynthesizer, AzureSynthesisAdapter } from 'melange/plugins';
@@ -103,6 +111,8 @@ synthesizer.dispose();
 
 #### 使用 Google Cloud TTS
 
+生产环境请通过 BFF 代理调用 Google Cloud TTS，不要把 API key 放入前端 bundle 或 URL 查询参数。
+
 ```typescript
 import { createSpeechSynthesizer, GoogleSynthesisAdapter } from 'melange/plugins';
 
@@ -121,6 +131,8 @@ synthesizer.dispose();
 ```
 
 #### 使用百度语音合成
+
+生产环境请通过 BFF 获取和使用 access token，前端不应长期持有云服务凭证。
 
 ```typescript
 import { createSpeechSynthesizer, BaiduSynthesisAdapter } from 'melange/plugins';
@@ -205,7 +217,7 @@ synthesizer.dispose();
 
 #### 自定义 BFF 适配器
 
-推荐使用 BFF 模式，通过自己的后端代理调用云服务：
+推荐使用 BFF 模式，通过自己的后端代理调用云服务。后端负责云厂商鉴权和签名，前端只传文本、语言、语速等业务参数：
 
 ```typescript
 import { createSpeechSynthesizer, GenericSynthesisAdapter } from 'melange/plugins';
@@ -220,6 +232,15 @@ const synthesizer = await createSpeechSynthesizer({
 await synthesizer.speak('使用自定义 BFF 后端合成');
 synthesizer.dispose();
 ```
+
+BFF 合成协议建议固定为：
+
+| 接口 | 方法 | 请求 | 成功响应 | 失败响应 |
+|------|------|------|----------|----------|
+| `/synthesize` | `POST` | JSON：`text`、`lang`、`voice`、`rate`、`pitch`、`volume`、`format` | 音频二进制，`Content-Type` 为 `audio/mpeg`、`audio/wav` 等 | JSON：`code`、`message`、`retryable`、`requestId?` |
+| `/voices` | `GET` | 无 | JSON：`{ voices: ICloudVoice[] }` | JSON：`code`、`message`、`retryable`、`requestId?` |
+
+BFF 必须执行 HTTPS、用户鉴权、文本长度限制、请求超时、云厂商密钥托管、日志脱敏和频率限制。前端不应保存或转发 `subscriptionKey`、`apiKey`、`secretKey`、`accessKeySecret` 等长期密钥。
 
 ### 快速云端朗读
 
@@ -250,6 +271,8 @@ await speakWithCloud('快速云端语音合成示例', adapter, {
 
 - **原生模式**：使用浏览器 Web Speech API
 - **云端模式**：支持百度、腾讯、讯飞、阿里云、Google、Azure 等第三方服务
+
+云端识别会处理麦克风音频，通常属于敏感个人数据。生产环境应在用户授权后采集，并通过 HTTPS 上传到自有 BFF，由后端完成云服务签名、转发、速率限制和数据保留控制。
 
 ### 快速识别
 
@@ -388,6 +411,8 @@ await recognizer.start();
 
 #### 百度云
 
+以下示例展示 API 形态。生产环境请通过 BFF 持有 `accessToken`、`appId` 和 `appKey`，不要在浏览器中长期保存。
+
 ```typescript
 import { createSpeechRecognizer, BaiduAdapter } from 'melange/plugins';
 
@@ -441,6 +466,15 @@ const recognizer = await createSpeechRecognizer({
   cloudAdapter: adapter,
 });
 ```
+
+BFF 识别协议建议固定为：
+
+| 接口 | 方法 | 请求 | 成功响应 | 失败响应 |
+|------|------|------|----------|----------|
+| `/recognize` | `POST` | `multipart/form-data`，字段 `file` 为 WAV 音频 | JSON：`{ text, score }` 或 `{ transcript, confidence }` | JSON：`code`、`message`、`retryable`、`requestId?` |
+| base URL | `WebSocket` | 二进制 PCM/WAV 分片或 BFF 自定义帧 | JSON 分片：`{ transcript, confidence, isFinal }` | JSON：`code`、`message`、`retryable`、`requestId?` |
+
+BFF 应默认限制音频格式为 WAV/PCM、采样率为 16000Hz、单次短音频大小不超过业务设定上限、请求超时不超过云厂商 SLA 预算，并在日志中移除音频内容和云厂商凭证。
 
 #### 阿里云
 
@@ -497,7 +531,7 @@ const recognizer = await createSpeechRecognizer({
 
 #### 自定义 BFF 适配器
 
-推荐使用 BFF 模式，通过自己的后端代理调用云服务：
+推荐使用 BFF 模式，通过自己的后端代理调用云服务。BFF 应限制音频大小、请求超时、允许的格式和调用频率：
 
 ```typescript
 import { createSpeechRecognizer, GenericAdapter } from 'melange/plugins';
@@ -658,7 +692,7 @@ console.log('当前提供商:', synthesizer.currentProvider);
 :::
 
 ::: warning 云服务安全
-生产环境中，建议通过后端代理调用云服务 API，避免在前端暴露密钥。
+生产环境中必须避免在前端暴露云服务长期密钥。推荐架构是：浏览器 SDK 只处理权限、录音和播放；BFF 负责鉴权、签名、限流、日志脱敏和云厂商调用；云服务只接收来自受控后端的请求。
 :::
 
 ::: tip 浏览器兼容性

@@ -264,15 +264,36 @@ export {
 
 export {
   // 语音合成
+  SynthesisStatus,
+  SynthesisAudioUtils,
+  GenericSynthesisAdapter,
+  AzureSynthesisAdapter,
+  GoogleSynthesisAdapter,
+  AWSSynthesisAdapter,
+  XunfeiSynthesisAdapter,
+  TencentSynthesisAdapter,
+  BaiduSynthesisAdapter,
+  AlibabaSynthesisAdapter,
   SpeechSynthesizerImpl,
   createSpeechSynthesizer,
   isSpeechSynthesisSupported,
   speak,
+  speakWithCloud,
   // 语音识别
   SpeechRecognizerImpl,
   createSpeechRecognizer,
   isSpeechRecognitionSupported,
   listen,
+  listenWithTimeout,
+  RecognitionStatus,
+  AudioUtils,
+  GenericAdapter,
+  XunfeiAdapter,
+  TencentAdapter,
+  BaiduAdapter,
+  AlibabaAdapter,
+  GoogleAdapter,
+  AzureAdapter,
   // 指纹识别
   FingerprintGeneratorImpl,
   createFingerprintGenerator,
@@ -307,6 +328,20 @@ export type {
   AWSSpeechConfig,
   CustomProviderConfig,
   ProviderConfig,
+  SynthesisEngineMode,
+  CloudAudioFormat,
+  ISynthesisResult,
+  ISynthesisError,
+  ICloudVoice,
+  IAdvancedSynthesisConfig,
+  ICloudSynthesisAdapter,
+  RecognitionEngineMode,
+  CloudTransportType,
+  IRecognitionResult,
+  IRecognitionError,
+  IAudioConfig,
+  IAdvancedRecognitionConfig,
+  ICloudRecognitionAdapter,
   FingerprintComponentKey,
   FingerprintComponentSource,
   FingerprintPrivacyMode,
@@ -330,7 +365,7 @@ export type {
  * 当前库版本
  * @constant
  */
-export const VERSION = '1.0.0';
+export const VERSION = '1.2.1';
 
 /**
  * 库名
