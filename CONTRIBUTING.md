@@ -32,12 +32,13 @@ melange/
 ├── src/
 │   ├── core/           # 面向对象工具（事件发射器、依赖注入、装饰器）
 │   ├── fp/             # 函数式编程工具
+│   ├── plugins/        # 扩展插件（语音、指纹等）
 │   ├── utils/          # 通用工具函数
 │   ├── types.ts        # TypeScript 类型定义
 │   └── index.ts        # 主入口点
 ├── tests/              # 测试文件
 ├── dist/               # 构建输出（生成的）
-└── docs/               # 文档（生成的）
+└── docs/               # VitePress 文档源码
 ```
 
 ## 代码风格
@@ -45,6 +46,7 @@ melange/
 - 我们使用 **ESLint** 和 **Prettier** 进行代码格式化
 - 运行 `npm run lint` 检查语法错误
 - 运行 `npm run format` 自动格式化代码
+- 公共 API、类型、参数和重要行为应保持 JSDoc 注释完整
 
 ## 编写代码
 
@@ -106,6 +108,24 @@ npm run test -- --watch
 npm run test:coverage
 ```
 
+### CI 门禁
+
+Pull Request 和 main 分支推送会运行完整质量门禁：
+
+```bash
+npm run check:version
+npm run lint
+npm run typecheck
+npm run test:coverage
+npm run check:coverage
+npm run build
+npm run test:exports
+npm run docs:build
+npm run pack:dry-run
+```
+
+新增或修改公共 API 时，请同步更新 README、VitePress 指南、API 文档和导出冒烟测试。插件文档应明确浏览器端、BFF 和第三方云服务之间的安全边界。
+
 ### 测试结构
 
 ```typescript
@@ -136,8 +156,25 @@ describe('myFunction', () => {
 - [ ] 测试通过 (`npm test`)
 - [ ] 语法检查通过 (`npm run lint`)
 - [ ] TypeScript 编译通过 (`npm run typecheck`)
+- [ ] 覆盖率检查通过 (`npm run test:coverage && npm run check:coverage`)
+- [ ] 构建通过 (`npm run build`)
+- [ ] 导出冒烟测试通过 (`npm run test:exports`)
+- [ ] 文档构建通过 (`npm run docs:build`)
+- [ ] npm 包内容检查通过 (`npm run pack:dry-run`)
 - [ ] 文档已更新
 - [ ] 为新函数添加了 JSDoc 注释
+
+## 发布流程
+
+发布由 `.github/workflows/publish-npm.yml` 在版本 tag 上触发，并先执行完整 CI 门禁。
+
+当前发布认证方式：
+
+- npmjs.com：使用仓库 Secret `NPM_TOKEN` 注入 `NODE_AUTH_TOKEN`，并执行 `npm publish --provenance --access public`。
+- GitHub Packages：使用 `GITHUB_TOKEN` 发布到 `https://npm.pkg.github.com`。
+- 发布前必须确保 `package.json`、`src/index.ts` 中的 `VERSION`、文档导航版本和 Git tag 一致。
+
+如果后续切回 npm Trusted Publishing/OIDC，应同时更新 `publish-npm.yml`、发布说明和贡献文档，避免 workflow 与文档口径漂移。
 
 ## 提交消息
 

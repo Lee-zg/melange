@@ -2,11 +2,49 @@
 
 所有重要更改都将记录在此文件中。
 
+## [1.2.5] - 2026-05-12
+
+### 修复
+
+- 修复发布工作流与依赖锁定文件，确保发布前质量门禁可重复运行。
+- 修正根入口导出聚合，保持 `@lee-zg/melange` 与 `@lee-zg/melange/plugins` 的公共 API 一致。
+
+### 发布
+
+- 发布流程继续执行版本一致性校验、lint、类型检查、覆盖率检查、构建、导出冒烟测试、文档构建和 `npm pack --dry-run`。
+- npm 发布命令保留 provenance 签名。当前 workflow 仍使用 `NPM_TOKEN` fallback 认证；如切回 npm Trusted Publishing/OIDC，需要同步更新 workflow 与文档。
+
+---
+
+## [1.2.4] - 2026-05-12
+
+### 新增
+
+#### 指纹识别插件 (`@lee-zg/melange/plugins`)
+
+- 新增隐私友好的浏览器/设备指纹模块，提供 `getFingerprint`、`createFingerprintGenerator`、`registerFingerprintPlugin` 和 `isFingerprintSupported`。
+- 默认只采集低敏环境信号，对屏幕、硬件线程、设备内存和 User-Agent 做分桶或归一化处理。
+- 支持 `strict`、`balanced`、`debug` 隐私模式，支持缓存、超时、盐值、自定义低敏采集器和 DI 注册。
+- 不内置 Canvas、音频、WebGL 渲染、字体枚举、浏览历史或插件列表等高熵采集。
+
+#### 商业化发布加固
+
+- 新增 PR/main CI 门禁，覆盖版本一致性、lint、类型检查、覆盖率、构建、导出冒烟测试、文档构建和 npm pack dry-run。
+- 新增覆盖率阈值检查与 exports smoke test，降低发布时导出漂移风险。
+- 语音文档和插件 API 明确生产推荐 BFF 模式，云厂商直连适配器标注为 demo-only 或 experimental。
+
+### 文档
+
+- 新增指纹识别指南与插件 API 文档。
+- 补充语音云端 BFF 协议、安全边界和适配器成熟度说明。
+
+---
+
 ## [1.1.0] - 2026-01-21
 
 ### 新增
 
-#### 语音识别插件重构 (`melange/plugins/speech`)
+#### 语音识别插件重构 (`@lee-zg/melange/plugins`)
 
 **架构升级**
 - 采用策略模式重构，支持原生识别 (Web Speech API) 和云端识别两种模式
@@ -58,27 +96,27 @@
 
 ### 新增
 
-#### 函数式编程模块 (`melange/fp`)
+#### 函数式编程模块 (`@lee-zg/melange/fp`)
 - `pipe` / `compose` / `flow` - 函数组合
 - `curry` / `uncurry` / `partial` - 柯里化
 - `ok` / `err` / `tryCatch` - Result 类型
 - `some` / `none` / `fromNullable` - Option 类型
 - `memoize` / `once` / `tap` - 高阶函数
 
-#### 工具函数模块 (`melange/utils`)
+#### 工具函数模块 (`@lee-zg/melange/utils`)
 - 对象工具：`deepClone`, `deepMerge`, `pick`, `omit`, `get`, `set`
 - 数组工具：`chunk`, `flatten`, `unique`, `groupBy`, `sortBy`
 - 字符串工具：`capitalize`, `camelCase`, `kebabCase`, `truncate`
 - 计时工具：`debounce`, `throttle`, `delay`, `retry`, `timeout`
 - 类型守卫：`isString`, `isNumber`, `isObject`, `isEmpty`
 
-#### 核心模块 (`melange/core`)
+#### 核心模块 (`@lee-zg/melange/core`)
 - `EventEmitter` - 类型安全的事件发射器
 - `Container` - IoC 依赖注入容器
 - 装饰器：`@Memoize`, `@Debounce`, `@Throttle`, `@Log`, `@Retry`
 - `Disposable` - 可释放资源管理
 
-#### 插件模块 (`melange/plugins`)
+#### 插件模块 (`@lee-zg/melange/plugins`)
 - 语音合成 (TTS)：`speak`, `createSpeechSynthesizer`
 - 语音识别 (STT)：`listen`, `createSpeechRecognizer`
 - 自动降级机制：浏览器 API → 第三方服务

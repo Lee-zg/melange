@@ -9,8 +9,8 @@ Result 类型有两种可能的值：
 - `Err<E>` - 表示失败，包含错误信息
 
 ```typescript
-import type { Result, Ok, Err } from 'melange';
-import { ok, err, isOk, isErr } from 'melange/fp';
+import type { Result, Ok, Err } from '@lee-zg/melange';
+import { ok, err, isOk, isErr } from '@lee-zg/melange/fp';
 
 // 创建成功结果
 const success: Result<number, string> = ok(42);
@@ -28,7 +28,7 @@ console.log(isErr(failure)); // true
 ### tryCatch
 
 ```typescript
-import { tryCatch } from 'melange/fp';
+import { tryCatch } from '@lee-zg/melange/fp';
 
 const parseJSON = (str: string) => JSON.parse(str);
 
@@ -42,7 +42,7 @@ console.log(isErr(badResult)); // true
 ### tryCatchAsync
 
 ```typescript
-import { tryCatchAsync } from 'melange/fp';
+import { tryCatchAsync } from '@lee-zg/melange/fp';
 
 const fetchData = async (url: string) => {
   const response = await fetch(url);
@@ -59,7 +59,7 @@ const result = await tryCatchAsync(() => fetchData('/api/data'));
 对成功值进行转换，错误值保持不变。
 
 ```typescript
-import { ok, err, mapResult } from 'melange/fp';
+import { ok, err, mapResult } from '@lee-zg/melange/fp';
 
 const success = ok(5);
 const doubled = mapResult(success, (x) => x * 2);
@@ -75,7 +75,7 @@ const stillFailure = mapResult(failure, (x) => x * 2);
 当转换函数也返回 Result 时使用。
 
 ```typescript
-import { ok, err, flatMapResult } from 'melange/fp';
+import { ok, err, flatMapResult } from '@lee-zg/melange/fp';
 
 const divide = (a: number, b: number): Result<number, string> => {
   if (b === 0) return err('除数不能为零');
@@ -96,7 +96,7 @@ const badResult = flatMapResult(ok(10), (x) => divide(x, 0));
 提取成功值，失败时返回默认值。
 
 ```typescript
-import { ok, err, unwrapOr } from 'melange/fp';
+import { ok, err, unwrapOr } from '@lee-zg/melange/fp';
 
 console.log(unwrapOr(ok(42), 0)); // 42
 console.log(unwrapOr(err('error'), 0)); // 0
@@ -107,7 +107,7 @@ console.log(unwrapOr(err('error'), 0)); // 0
 提取成功值，失败时调用函数生成默认值。
 
 ```typescript
-import { ok, err, unwrapOrElse } from 'melange/fp';
+import { ok, err, unwrapOrElse } from '@lee-zg/melange/fp';
 
 const result = unwrapOrElse(err('not found'), (error) => {
   console.log('处理错误:', error);
@@ -124,7 +124,7 @@ const result = unwrapOrElse(err('not found'), (error) => {
 最强大的 Result 处理方式，分别处理成功和失败情况。
 
 ```typescript
-import { ok, err, matchResult } from 'melange/fp';
+import { ok, err, matchResult } from '@lee-zg/melange/fp';
 
 const result = ok(42);
 
@@ -139,7 +139,7 @@ console.log(message); // "成功: 42"
 ## 实际应用示例
 
 ```typescript
-import { tryCatch, mapResult, flatMapResult, matchResult } from 'melange/fp';
+import { tryCatch, mapResult, flatMapResult, matchResult } from '@lee-zg/melange/fp';
 
 // 定义业务逻辑
 const parseNumber = (str: string) =>

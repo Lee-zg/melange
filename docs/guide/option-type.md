@@ -9,8 +9,8 @@ Option 类型有两种可能的值：
 - `None` - 表示没有值
 
 ```typescript
-import type { Option, Some, None } from 'melange';
-import { some, none, isSome, isNone } from 'melange/fp';
+import type { Option, Some, None } from '@lee-zg/melange';
+import { some, none, isSome, isNone } from '@lee-zg/melange/fp';
 
 // 创建有值的 Option
 const hasValue: Option<number> = some(42);
@@ -28,7 +28,7 @@ console.log(isNone(empty)); // true
 ### fromNullable
 
 ```typescript
-import { fromNullable, isSome } from 'melange/fp';
+import { fromNullable, isSome } from '@lee-zg/melange/fp';
 
 const value1 = fromNullable('hello');
 console.log(isSome(value1)); // true
@@ -47,7 +47,7 @@ console.log(isNone(value3)); // true
 对存在的值进行转换。
 
 ```typescript
-import { some, none, mapOption } from 'melange/fp';
+import { some, none, mapOption } from '@lee-zg/melange/fp';
 
 const doubled = mapOption(some(5), (x) => x * 2);
 // Some(10)
@@ -61,7 +61,7 @@ const stillNone = mapOption(none(), (x) => x * 2);
 当转换函数也返回 Option 时使用。
 
 ```typescript
-import { some, none, flatMapOption } from 'melange/fp';
+import { some, none, flatMapOption } from '@lee-zg/melange/fp';
 
 const findUser = (id: number): Option<{ name: string }> =>
   id > 0 ? some({ name: 'Alice' }) : none();
@@ -78,7 +78,7 @@ const noResult = flatMapOption(some(-1), findUser);
 根据条件过滤值。
 
 ```typescript
-import { some, filterOption, isSome } from 'melange/fp';
+import { some, filterOption, isSome } from '@lee-zg/melange/fp';
 
 const positive = filterOption(some(5), (x) => x > 0);
 console.log(isSome(positive)); // true
@@ -94,7 +94,7 @@ console.log(isNone(filtered)); // true
 提取值，没有值时返回默认值。
 
 ```typescript
-import { some, none, getOrElse } from 'melange/fp';
+import { some, none, getOrElse } from '@lee-zg/melange/fp';
 
 console.log(getOrElse(some(42), 0)); // 42
 console.log(getOrElse(none(), 0)); // 0
@@ -105,7 +105,7 @@ console.log(getOrElse(none(), 0)); // 0
 提取值，没有值时调用函数生成默认值。
 
 ```typescript
-import { some, none, getOrElseL } from 'melange/fp';
+import { some, none, getOrElseL } from '@lee-zg/melange/fp';
 
 const value = getOrElseL(none(), () => {
   console.log('生成默认值');
@@ -120,7 +120,7 @@ const value = getOrElseL(none(), () => {
 将 Option 转回可空值。
 
 ```typescript
-import { some, none, toNullable } from 'melange/fp';
+import { some, none, toNullable } from '@lee-zg/melange/fp';
 
 console.log(toNullable(some(42))); // 42
 console.log(toNullable(none())); // null
@@ -133,7 +133,7 @@ console.log(toNullable(none())); // null
 分别处理有值和无值的情况。
 
 ```typescript
-import { some, none, matchOption } from 'melange/fp';
+import { some, none, matchOption } from '@lee-zg/melange/fp';
 
 const message = matchOption(some(42), {
   some: (value) => `找到值: ${value}`,
@@ -150,7 +150,7 @@ console.log(message); // "找到值: 42"
 当 Option 为 None 时，返回备选 Option。
 
 ```typescript
-import { some, none, alt } from 'melange/fp';
+import { some, none, alt } from '@lee-zg/melange/fp';
 
 const result1 = alt(some(1), () => some(2));
 // Some(1)
@@ -162,7 +162,7 @@ const result2 = alt(none(), () => some(2));
 ## 实际应用示例
 
 ```typescript
-import { fromNullable, mapOption, flatMapOption, getOrElse } from 'melange/fp';
+import { fromNullable, mapOption, flatMapOption, getOrElse } from '@lee-zg/melange/fp';
 
 interface User {
   name: string;
