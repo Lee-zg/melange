@@ -1,5 +1,11 @@
 # 插件 API
 
+插件模块通过 `@lee-zg/melange/plugins` 导出语音和指纹能力，也可从根入口按需导入已重导出的公共 API。
+
+::: warning 安全与隐私基线
+语音云端能力生产环境应优先使用 `GenericSynthesisAdapter` / `GenericAdapter` 对接自有 BFF。浏览器 SDK 只处理权限、录音和播放，云厂商鉴权、签名、限流、超时、审计和日志脱敏应由后端完成。指纹模块默认只采集低敏环境信号，不内置 Canvas、音频、WebGL 渲染、字体枚举、浏览历史或插件列表等高熵采集行为。
+:::
+
 ## 指纹识别
 
 ### getFingerprint

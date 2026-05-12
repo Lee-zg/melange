@@ -18,7 +18,7 @@ class EventEmitter<Events extends Record<string, unknown>> {
 
 **示例：**
 ```typescript
-import { EventEmitter } from 'melange/core';
+import { EventEmitter } from '@lee-zg/melange/core';
 
 interface AppEvents {
   userLogin: { userId: string; timestamp: number };

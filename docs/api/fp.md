@@ -15,7 +15,7 @@ function pipe<A, B, C>(a: A, ab: (a: A) => B, bc: (b: B) => C): C;
 
 **示例：**
 ```typescript
-import { pipe } from 'melange/fp';
+import { pipe } from '@lee-zg/melange/fp';
 
 const result = pipe(
   5,

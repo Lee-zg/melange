@@ -10,19 +10,19 @@
 ::: code-group
 
 ```bash [npm]
-npm install melange
+npm install @lee-zg/melange
 ```
 
 ```bash [yarn]
-yarn add melange
+yarn add @lee-zg/melange
 ```
 
 ```bash [pnpm]
-pnpm add melange
+pnpm add @lee-zg/melange
 ```
 
 ```bash [bun]
-bun add melange
+bun add @lee-zg/melange
 ```
 
 :::
@@ -34,11 +34,11 @@ bun add melange
 ```html
 <!-- ESM 版本 -->
 <script type="module">
-  import * as melange from 'https://unpkg.com/melange/dist/index.js';
+  import * as melange from 'https://unpkg.com/@lee-zg/melange/dist/index.js';
 </script>
 
 <!-- UMD 版本 -->
-<script src="https://unpkg.com/melange/dist/index.cjs"></script>
+<script src="https://unpkg.com/@lee-zg/melange/dist/index.cjs"></script>
 ```
 
 ## TypeScript 配置
@@ -68,7 +68,7 @@ Melange 完全使用 TypeScript 编写，内置类型定义。推荐的 `tsconfi
 ### 完整导入
 
 ```typescript
-import * as melange from 'melange';
+import * as melange from '@lee-zg/melange';
 ```
 
 ### 子模块导入（推荐）
@@ -77,24 +77,33 @@ import * as melange from 'melange';
 
 ```typescript
 // 函数式编程模块
-import { pipe, compose, curry, tryCatch } from 'melange/fp';
+import { pipe, compose, curry, tryCatch } from '@lee-zg/melange/fp';
 
 // 工具函数模块
-import { debounce, throttle, deepClone } from 'melange/utils';
+import { debounce, throttle, deepClone } from '@lee-zg/melange/utils';
 
 // 核心 OOP 模块
-import { EventEmitter, Container, Injectable } from 'melange/core';
+import { EventEmitter, Container, Injectable } from '@lee-zg/melange/core';
 
 // 插件模块
-import { speak, listen, createSpeechSynthesizer } from 'melange/plugins';
+import {
+  speak,
+  listen,
+  createSpeechSynthesizer,
+  getFingerprint,
+} from '@lee-zg/melange/plugins';
 ```
+
+::: warning 插件安全边界
+语音云端适配器生产环境应通过自有 BFF 代理接入，不要在浏览器中保存或传输云厂商长期密钥。指纹模块默认只采集低敏信号，但仍应在业务中提供清晰告知和用途限制。
+:::
 
 ## 验证安装
 
 创建一个测试文件验证安装是否成功：
 
 ```typescript
-import { pipe, ok, isOk } from 'melange/fp';
+import { pipe, ok, isOk } from '@lee-zg/melange/fp';
 
 const result = pipe(
   5,
@@ -110,3 +119,4 @@ console.log('Melange 安装成功！');
 
 - 了解[快速开始](/guide/getting-started)中的基本用法
 - 深入学习[函数式编程](/guide/functional-programming)概念
+- 使用[语音功能](/guide/speech)和[指纹识别](/guide/fingerprint)插件

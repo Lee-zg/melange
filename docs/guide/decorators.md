@@ -22,7 +22,7 @@ Melange 提供了一系列实用的装饰器，简化常见的编程模式。
 缓存方法的返回值。
 
 ```typescript
-import { Memoize } from 'melange/core';
+import { Memoize } from '@lee-zg/melange/core';
 
 class Calculator {
   @Memoize()
@@ -42,7 +42,7 @@ calc.expensiveCalculation(5); // 25（使用缓存）
 防抖装饰器，延迟执行方法。
 
 ```typescript
-import { Debounce } from 'melange/core';
+import { Debounce } from '@lee-zg/melange/core';
 
 class SearchService {
   @Debounce(300)
@@ -62,7 +62,7 @@ service.search('abc'); // 只有这次会执行
 节流装饰器，限制方法执行频率。
 
 ```typescript
-import { Throttle } from 'melange/core';
+import { Throttle } from '@lee-zg/melange/core';
 
 class ScrollHandler {
   @Throttle(100)
@@ -77,7 +77,7 @@ class ScrollHandler {
 自动记录方法调用日志。
 
 ```typescript
-import { Log } from 'melange/core';
+import { Log } from '@lee-zg/melange/core';
 
 class UserService {
   @Log()
@@ -97,7 +97,7 @@ service.createUser('Alice');
 自动重试失败的方法。
 
 ```typescript
-import { Retry } from 'melange/core';
+import { Retry } from '@lee-zg/melange/core';
 
 class ApiService {
   private attempts = 0;
@@ -118,7 +118,7 @@ class ApiService {
 为方法设置超时限制。
 
 ```typescript
-import { Timeout } from 'melange/core';
+import { Timeout } from '@lee-zg/melange/core';
 
 class SlowService {
   @Timeout(5000) // 5秒超时
@@ -133,7 +133,7 @@ class SlowService {
 验证方法参数。
 
 ```typescript
-import { Validate } from 'melange/core';
+import { Validate } from '@lee-zg/melange/core';
 
 class UserService {
   @Validate((name: string) => name.length > 0, '名称不能为空')
@@ -151,7 +151,7 @@ service.createUser(''); // 抛出错误: 名称不能为空
 标记方法为已废弃。
 
 ```typescript
-import { Deprecated } from 'melange/core';
+import { Deprecated } from '@lee-zg/melange/core';
 
 class OldService {
   @Deprecated('请使用 newMethod 代替')
@@ -166,7 +166,7 @@ class OldService {
 自动绑定方法的 `this` 上下文。
 
 ```typescript
-import { Bind } from 'melange/core';
+import { Bind } from '@lee-zg/melange/core';
 
 class Counter {
   count = 0;
@@ -189,7 +189,7 @@ fn(); // this 正确绑定，count = 1
 封闭类，阻止添加新属性。
 
 ```typescript
-import { Sealed } from 'melange/core';
+import { Sealed } from '@lee-zg/melange/core';
 
 @Sealed()
 class Config {
@@ -206,7 +206,7 @@ const config = new Config();
 冻结类实例，完全不可变。
 
 ```typescript
-import { Frozen } from 'melange/core';
+import { Frozen } from '@lee-zg/melange/core';
 
 @Frozen()
 class ImmutableData {

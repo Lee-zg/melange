@@ -11,7 +11,7 @@ Melange 提供了一个轻量级的 IoC（控制反转）容器，支持依赖�
 ### 创建容器
 
 ```typescript
-import { Container } from 'melange/core';
+import { Container } from '@lee-zg/melange/core';
 
 const container = new Container();
 ```
@@ -43,7 +43,7 @@ const config = container.resolve<Config>('config');
 每次解析都创建新实例。
 
 ```typescript
-import { Container, Lifecycle } from 'melange/core';
+import { Container, Lifecycle } from '@lee-zg/melange/core';
 
 container.register('Service', Service, Lifecycle.Transient);
 
@@ -71,7 +71,7 @@ console.log(s1 === s2); // true
 标记类为可注入。
 
 ```typescript
-import { Injectable } from 'melange/core';
+import { Injectable } from '@lee-zg/melange/core';
 
 @Injectable()
 class UserService {
@@ -86,7 +86,7 @@ class UserService {
 注入依赖。
 
 ```typescript
-import { Injectable, Inject } from 'melange/core';
+import { Injectable, Inject } from '@lee-zg/melange/core';
 
 @Injectable()
 class UserController {
@@ -103,7 +103,7 @@ class UserController {
 将类注册为单例。
 
 ```typescript
-import { Singleton } from 'melange/core';
+import { Singleton } from '@lee-zg/melange/core';
 
 @Singleton()
 class ConfigService {
@@ -120,7 +120,7 @@ class ConfigService {
 Melange 提供了一个全局容器实例。
 
 ```typescript
-import { globalContainer, Injectable, Singleton } from 'melange/core';
+import { globalContainer, Injectable, Singleton } from '@lee-zg/melange/core';
 
 @Singleton()
 @Injectable()
@@ -138,7 +138,7 @@ const config = globalContainer.resolve<AppConfig>('AppConfig');
 ## 完整示例
 
 ```typescript
-import { Container, Injectable, Inject, Singleton, Lifecycle } from 'melange/core';
+import { Container, Injectable, Inject, Singleton, Lifecycle } from '@lee-zg/melange/core';
 
 // 定义接口
 interface Logger {

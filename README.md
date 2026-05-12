@@ -19,6 +19,7 @@
 - **类型安全** - 完整的 TypeScript 支持和全面的类型定义
 - **可摇树优化** - 只导入你需要的内容
 - **零依赖** - 轻量级且自包含
+- **语音插件** - 浏览器原生 TTS/STT 与 BFF 云端适配器，适合受控接入第三方语音服务
 - **隐私友好指纹** - 低敏设备/浏览器指纹，支持分桶、缓存和 DI 接入
 - **文档完善** - 每个函数都有 JSDoc 注释
 
@@ -67,7 +68,7 @@ emitter.emit('message', 'Hello, World!');
 
 ## 模块
 
-Melange 组织为三个主要模块：
+Melange 组织为四个主要模块：
 
 ### 函数式编程 (`@lee-zg/melange/fp`)
 
@@ -103,6 +104,22 @@ import {
   Disposable, DisposableStore            // 资源管理
 } from '@lee-zg/melange/core';
 ```
+
+### 插件 (`@lee-zg/melange/plugins`)
+
+```typescript
+import {
+  speak, listen,                         // 语音合成与识别快捷方法
+  createSpeechSynthesizer,               // 可复用语音合成器
+  createSpeechRecognizer,                // 可复用语音识别器
+  getFingerprint,                        // 快速生成隐私友好指纹
+  createFingerprintGenerator             // 可复用指纹生成器
+} from '@lee-zg/melange/plugins';
+```
+
+语音云端能力推荐通过自有 BFF 接入。浏览器端只负责权限、录音和播放；云厂商鉴权、签名、限流、超时、审计和日志脱敏应由后端完成，不应在前端保存或传输 `apiKey`、`secretKey`、`accessKeySecret`、`subscriptionKey` 等长期密钥。
+
+指纹模块默认只采集低敏环境信号，并对屏幕、硬件线程、设备内存和 User-Agent 做分桶或归一化处理。模块不内置 Canvas、音频、WebGL 渲染、字体枚举、浏览历史或插件列表等高熵采集行为。
 
 ## API 参考
 
@@ -224,6 +241,34 @@ class UserService {
 }
 ```
 
+### 语音插件
+
+```typescript
+import { speak, listen } from '@lee-zg/melange/plugins';
+
+await speak('你好，世界！', { lang: 'zh-CN' });
+
+const result = await listen({ lang: 'zh-CN' });
+console.log(result.bestTranscript);
+```
+
+云端 TTS/STT 生产部署建议使用 `GenericSynthesisAdapter` / `GenericAdapter` 对接自有 BFF。内置云厂商直连适配器主要用于本地验证和 API 形态演示。
+
+### 指纹插件
+
+```typescript
+import { getFingerprint } from '@lee-zg/melange/plugins';
+
+const result = await getFingerprint({
+  salt: 'my-app',
+  privacyMode: 'balanced',
+});
+
+console.log(result.visitorId);
+```
+
+指纹结果适合用于风控、反滥用、设备一致性辅助判断等有限场景。生产环境应提供清晰告知、合法依据、用途限制和退出机制，不应将其用于跨站跟踪或绕过用户隐私偏好。
+
 ## TypeScript 支持
 
 Melange 使用 TypeScript 编写，并提供全面的类型定义：
@@ -247,6 +292,15 @@ Melange 支持所有现代浏览器和 Node.js 18+：
 - Safari 14+
 - Edge 80+
 - Node.js 18+
+
+语音识别依赖浏览器麦克风权限和 Web Speech API/AudioContext 支持；云端语音能力建议通过 HTTPS BFF 接入。指纹模块可在浏览器中使用，Node.js 环境会自动跳过不可用的浏览器组件。
+
+## 文档
+
+- [快速开始](https://lee-zg.github.io/melange/guide/getting-started)
+- [语音功能指南](https://lee-zg.github.io/melange/guide/speech)
+- [指纹识别指南](https://lee-zg.github.io/melange/guide/fingerprint)
+- [插件 API](https://lee-zg.github.io/melange/api/plugins)
 
 ## 贡献
 

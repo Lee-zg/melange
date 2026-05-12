@@ -9,7 +9,7 @@ Melange 提供了一套完整的函数式编程工具，帮助你编写更简洁
 `pipe` 从左到右组合函数，将前一个函数的输出作为下一个函数的输入。
 
 ```typescript
-import { pipe } from 'melange/fp';
+import { pipe } from '@lee-zg/melange/fp';
 
 const addOne = (x: number) => x + 1;
 const double = (x: number) => x * 2;
@@ -24,7 +24,7 @@ console.log(result); // "结果: 12"
 `compose` 从右到左组合函数，数学风格的函数组合。
 
 ```typescript
-import { compose } from 'melange/fp';
+import { compose } from '@lee-zg/melange/fp';
 
 const addOne = (x: number) => x + 1;
 const double = (x: number) => x * 2;
@@ -39,7 +39,7 @@ console.log(fn(5)); // 12
 `flow` 类似于 `pipe`，但返回一个函数而不是立即执行。
 
 ```typescript
-import { flow } from 'melange/fp';
+import { flow } from '@lee-zg/melange/fp';
 
 const process = flow(
   (x: number) => x + 1,
@@ -57,7 +57,7 @@ console.log(process(5)); // "结果: 12"
 将多参数函数转换为一系列单参数函数。
 
 ```typescript
-import { curry } from 'melange/fp';
+import { curry } from '@lee-zg/melange/fp';
 
 const add = (a: number, b: number, c: number) => a + b + c;
 const curriedAdd = curry(add);
@@ -73,7 +73,7 @@ console.log(curriedAdd(1)(2, 3)); // 6
 部分应用函数参数。
 
 ```typescript
-import { partial } from 'melange/fp';
+import { partial } from '@lee-zg/melange/fp';
 
 const greet = (greeting: string, name: string) => `${greeting}, ${name}!`;
 const sayHello = partial(greet, 'Hello');
@@ -88,7 +88,7 @@ console.log(sayHello('World')); // "Hello, World!"
 缓存函数结果，避免重复计算。
 
 ```typescript
-import { memoize } from 'melange/fp';
+import { memoize } from '@lee-zg/melange/fp';
 
 const expensiveCalc = memoize((n: number) => {
   console.log('计算中...');
@@ -104,7 +104,7 @@ console.log(expensiveCalc(5)); // 25（使用缓存）
 确保函数只执行一次。
 
 ```typescript
-import { once } from 'melange/fp';
+import { once } from '@lee-zg/melange/fp';
 
 const init = once(() => {
   console.log('初始化');
@@ -120,7 +120,7 @@ init(); // 不执行
 执行副作用但返回原值，用于调试。
 
 ```typescript
-import { pipe, tap } from 'melange/fp';
+import { pipe, tap } from '@lee-zg/melange/fp';
 
 const result = pipe(
   5,
@@ -135,7 +135,7 @@ const result = pipe(
 创建谓词函数的否定版本。
 
 ```typescript
-import { not } from 'melange/fp';
+import { not } from '@lee-zg/melange/fp';
 
 const isEven = (n: number) => n % 2 === 0;
 const isOdd = not(isEven);
@@ -149,7 +149,7 @@ console.log(isOdd(4)); // false
 组合多个谓词函数。
 
 ```typescript
-import { allPass, anyPass } from 'melange/fp';
+import { allPass, anyPass } from '@lee-zg/melange/fp';
 
 const isPositive = (n: number) => n > 0;
 const isEven = (n: number) => n % 2 === 0;

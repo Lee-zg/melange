@@ -1,6 +1,6 @@
 # 语音功能
 
-Melange 提供了内置的语音合成（TTS）和语音识别（STT）功能，优先使用浏览器原生 API，支持自动降级到第三方服务。
+Melange 提供了内置的语音合成（TTS）和语音识别（STT）功能，优先使用浏览器原生 API。需要接入云服务时，推荐通过自有 BFF 代理完成鉴权、签名、限流和审计。
 
 ::: warning 生产安全边界
 商业项目应默认通过 BFF/后端代理接入云服务。直接在浏览器中传入 `apiKey`、`secretKey`、`accessKeySecret`、`subscriptionKey` 或长期 `accessToken` 的示例仅用于本地验证和 API 形态说明，不应作为生产部署方式。
@@ -11,7 +11,7 @@ Melange 提供了内置的语音合成（TTS）和语音识别（STT）功能，
 ### 快速朗读
 
 ```typescript
-import { speak } from 'melange/plugins';
+import { speak } from '@lee-zg/melange/plugins';
 
 // 最简单的用法
 await speak('你好，世界！');
@@ -28,7 +28,7 @@ await speak('Hello World', {
 ### 高级用法
 
 ```typescript
-import { createSpeechSynthesizer } from 'melange/plugins';
+import { createSpeechSynthesizer } from '@lee-zg/melange/plugins';
 
 // 创建语音合成器实例
 const synthesizer = await createSpeechSynthesizer({
@@ -82,7 +82,7 @@ synthesizer.dispose();
 以下示例展示适配器 API 形态。生产环境请改用 BFF 代理，不要把 Azure subscription key 暴露给浏览器。
 
 ```typescript
-import { createSpeechSynthesizer, AzureSynthesisAdapter } from 'melange/plugins';
+import { createSpeechSynthesizer, AzureSynthesisAdapter } from '@lee-zg/melange/plugins';
 
 // 创建 Azure 适配器
 const adapter = new AzureSynthesisAdapter(
@@ -114,7 +114,7 @@ synthesizer.dispose();
 生产环境请通过 BFF 代理调用 Google Cloud TTS，不要把 API key 放入前端 bundle 或 URL 查询参数。
 
 ```typescript
-import { createSpeechSynthesizer, GoogleSynthesisAdapter } from 'melange/plugins';
+import { createSpeechSynthesizer, GoogleSynthesisAdapter } from '@lee-zg/melange/plugins';
 
 const adapter = new GoogleSynthesisAdapter(
   'your-api-key',
@@ -135,7 +135,7 @@ synthesizer.dispose();
 生产环境请通过 BFF 获取和使用 access token，前端不应长期持有云服务凭证。
 
 ```typescript
-import { createSpeechSynthesizer, BaiduSynthesisAdapter } from 'melange/plugins';
+import { createSpeechSynthesizer, BaiduSynthesisAdapter } from '@lee-zg/melange/plugins';
 
 // 百度语音合成需要 access_token
 // 生产环境建议通过后端获取
@@ -156,7 +156,7 @@ synthesizer.dispose();
 #### 使用讯飞语音合成
 
 ```typescript
-import { createSpeechSynthesizer, XunfeiSynthesisAdapter } from 'melange/plugins';
+import { createSpeechSynthesizer, XunfeiSynthesisAdapter } from '@lee-zg/melange/plugins';
 
 const adapter = new XunfeiSynthesisAdapter(
   'your-app-id',
@@ -177,7 +177,7 @@ synthesizer.dispose();
 #### 使用腾讯云语音合成
 
 ```typescript
-import { createSpeechSynthesizer, TencentSynthesisAdapter } from 'melange/plugins';
+import { createSpeechSynthesizer, TencentSynthesisAdapter } from '@lee-zg/melange/plugins';
 
 const adapter = new TencentSynthesisAdapter(
   'your-secret-id',
@@ -197,7 +197,7 @@ synthesizer.dispose();
 #### 使用阿里云语音合成
 
 ```typescript
-import { createSpeechSynthesizer, AlibabaSynthesisAdapter } from 'melange/plugins';
+import { createSpeechSynthesizer, AlibabaSynthesisAdapter } from '@lee-zg/melange/plugins';
 
 const adapter = new AlibabaSynthesisAdapter(
   'your-access-key-id',
@@ -220,7 +220,7 @@ synthesizer.dispose();
 推荐使用 BFF 模式，通过自己的后端代理调用云服务。后端负责云厂商鉴权和签名，前端只传文本、语言、语速等业务参数：
 
 ```typescript
-import { createSpeechSynthesizer, GenericSynthesisAdapter } from 'melange/plugins';
+import { createSpeechSynthesizer, GenericSynthesisAdapter } from '@lee-zg/melange/plugins';
 
 const adapter = new GenericSynthesisAdapter('https://api.yoursite.com/tts');
 
@@ -245,9 +245,9 @@ BFF 必须执行 HTTPS、用户鉴权、文本长度限制、请求超时、云�
 ### 快速云端朗读
 
 ```typescript
-import { speakWithCloud, AzureSynthesisAdapter } from 'melange/plugins';
+import { speakWithCloud, GenericSynthesisAdapter } from '@lee-zg/melange/plugins';
 
-const adapter = new AzureSynthesisAdapter('key', 'eastasia');
+const adapter = new GenericSynthesisAdapter('https://api.yoursite.com/tts');
 
 // 一行代码完成云端语音合成
 await speakWithCloud('快速云端语音合成示例', adapter, {
@@ -277,7 +277,7 @@ await speakWithCloud('快速云端语音合成示例', adapter, {
 ### 快速识别
 
 ```typescript
-import { listen, listenWithTimeout } from 'melange/plugins';
+import { listen, listenWithTimeout } from '@lee-zg/melange/plugins';
 
 // 进行一次语音识别
 const result = await listen({ lang: 'zh-CN' });
@@ -298,7 +298,7 @@ try {
 使用浏览器原生 Web Speech API：
 
 ```typescript
-import { createSpeechRecognizer, RecognitionStatus } from 'melange/plugins';
+import { createSpeechRecognizer, RecognitionStatus } from '@lee-zg/melange/plugins';
 
 // 创建语音识别器实例
 const recognizer = await createSpeechRecognizer({
@@ -343,7 +343,7 @@ recognizer.dispose();
 #### WebSocket 流式识别
 
 ```typescript
-import { createSpeechRecognizer, BaiduAdapter } from 'melange/plugins';
+import { createSpeechRecognizer, BaiduAdapter } from '@lee-zg/melange/plugins';
 
 // 创建百度适配器
 const adapter = new BaiduAdapter(
@@ -380,7 +380,7 @@ await recognizer.start();
 #### HTTP 短语音识别
 
 ```typescript
-import { createSpeechRecognizer, TencentAdapter } from 'melange/plugins';
+import { createSpeechRecognizer, TencentAdapter } from '@lee-zg/melange/plugins';
 
 // 创建腾讯云适配器
 const adapter = new TencentAdapter(
@@ -414,7 +414,7 @@ await recognizer.start();
 以下示例展示 API 形态。生产环境请通过 BFF 持有 `accessToken`、`appId` 和 `appKey`，不要在浏览器中长期保存。
 
 ```typescript
-import { createSpeechRecognizer, BaiduAdapter } from 'melange/plugins';
+import { createSpeechRecognizer, BaiduAdapter } from '@lee-zg/melange/plugins';
 
 // 百度语音识别需要 access_token
 // 生产环境建议通过后端获取
@@ -435,7 +435,7 @@ const recognizer = await createSpeechRecognizer({
 #### 讯飞云
 
 ```typescript
-import { createSpeechRecognizer, XunfeiAdapter } from 'melange/plugins';
+import { createSpeechRecognizer, XunfeiAdapter } from '@lee-zg/melange/plugins';
 
 const adapter = new XunfeiAdapter(
   'your-app-id',
@@ -453,7 +453,7 @@ const recognizer = await createSpeechRecognizer({
 #### 腾讯云
 
 ```typescript
-import { createSpeechRecognizer, TencentAdapter } from 'melange/plugins';
+import { createSpeechRecognizer, TencentAdapter } from '@lee-zg/melange/plugins';
 
 const adapter = new TencentAdapter(
   'your-secret-id',
@@ -479,7 +479,7 @@ BFF 应默认限制音频格式为 WAV/PCM、采样率为 16000Hz、单次短音
 #### 阿里云
 
 ```typescript
-import { createSpeechRecognizer, AlibabaAdapter } from 'melange/plugins';
+import { createSpeechRecognizer, AlibabaAdapter } from '@lee-zg/melange/plugins';
 
 const adapter = new AlibabaAdapter(
   'your-access-key-id',
@@ -497,7 +497,7 @@ const recognizer = await createSpeechRecognizer({
 #### Google Cloud Speech
 
 ```typescript
-import { createSpeechRecognizer, GoogleAdapter } from 'melange/plugins';
+import { createSpeechRecognizer, GoogleAdapter } from '@lee-zg/melange/plugins';
 
 const adapter = new GoogleAdapter(
   'your-api-key',
@@ -514,7 +514,7 @@ const recognizer = await createSpeechRecognizer({
 #### Azure Speech
 
 ```typescript
-import { createSpeechRecognizer, AzureAdapter } from 'melange/plugins';
+import { createSpeechRecognizer, AzureAdapter } from '@lee-zg/melange/plugins';
 
 const adapter = new AzureAdapter(
   'your-subscription-key',
@@ -534,7 +534,7 @@ const recognizer = await createSpeechRecognizer({
 推荐使用 BFF 模式，通过自己的后端代理调用云服务。BFF 应限制音频大小、请求超时、允许的格式和调用频率：
 
 ```typescript
-import { createSpeechRecognizer, GenericAdapter } from 'melange/plugins';
+import { createSpeechRecognizer, GenericAdapter } from '@lee-zg/melange/plugins';
 
 const adapter = new GenericAdapter('https://api.yoursite.com/speech');
 
@@ -635,7 +635,7 @@ const recognizer = await createSpeechRecognizer({
 ## 检查浏览器支持
 
 ```typescript
-import { isSpeechSynthesisSupported, isSpeechRecognitionSupported } from 'melange/plugins';
+import { isSpeechSynthesisSupported, isSpeechRecognitionSupported } from '@lee-zg/melange/plugins';
 
 if (isSpeechSynthesisSupported()) {
   console.log('浏览器支持语音合成');
